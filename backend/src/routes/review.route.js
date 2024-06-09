@@ -1,6 +1,12 @@
 import express from "express";
 const router = express.Router();
 
+// Validation
+import {
+  createReviewValidation,
+  updateReviewValidation,
+} from "../utils/validation.js";
+
 // Review
 let reviewController = require("../controller/reviewController");
 

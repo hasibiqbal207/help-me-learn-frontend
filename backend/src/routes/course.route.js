@@ -1,6 +1,12 @@
 import express from "express";
 const router = express.Router();
 
+// Validation
+import {
+  createCourseValidation,
+  updateCourseValidation,
+} from "../utils/validation.js";
+
 // Course
 let courseController = require("../controller/courseController");
 

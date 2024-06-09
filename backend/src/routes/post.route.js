@@ -1,6 +1,12 @@
 import express from "express";
 const router = express.Router();
 
+// Validation
+import {
+  createPostValidation,
+  updatePostValidation,
+} from "../utils/validation.js";
+
 let postController = require("../controller/postController");
 
 router.get("/posts", postController.searchPost);
