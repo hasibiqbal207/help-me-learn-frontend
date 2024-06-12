@@ -1,8 +1,9 @@
 import express from "express";
 const router = express.Router();
 
-import { tutorAuth } from "../middlewares/tutorAuth";
+import { isTutor } from "../middlewares/tutorAuth.js";
+import { upload } from "../controllers/upload.controller.js";
 
-let uploadController = require("../controller/uploadController");
-router.post("/upload", tutorAuth.isTutor, uploadController.upload);
+router.post("/upload", isTutor, upload);
+
 export default router;

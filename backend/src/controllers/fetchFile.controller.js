@@ -1,6 +1,8 @@
-const uploadFile = require("../middleware/upload");
-const database = require("../database");
-require("dotenv").config();
+import database from "../../database.js";
+
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const file = async (req, res) => {
   let id = req.params.id;

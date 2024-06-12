@@ -6,7 +6,7 @@ services:
     container_name: mysql_container
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mydatabase
+      MYSQL_DATABASE: helpmelearn
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:

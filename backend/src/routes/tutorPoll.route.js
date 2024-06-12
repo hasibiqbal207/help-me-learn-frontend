@@ -1,10 +1,11 @@
 import express from "express";
 const router = express.Router();
 
-import { createPollValidation } from "../utils/validation";
+import validation from "../utils/validation.js";
+const { createPollValidation } = validation;
+import { viewPolls, createPoll } from "../controllers/tutorPoll.controller.js"
 
-let tutorPollController = require("../controller/TutorPollController");
+router.post("/polls", createPollValidation, createPoll);
+router.get("/polls", viewPolls);
 
-router.post("/polls", createPollValidation, tutorPollController.createPoll);
-router.get("/polls", tutorPollController.viewPolls);
 export default router;

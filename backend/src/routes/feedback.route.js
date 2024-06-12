@@ -1,10 +1,11 @@
 import express from "express";
 const router = express.Router();
 
+import {getFeedbacks, getFeedbackById, createUserFeedback} from "../controllers/feedback.controller.js"
+
 // Feedback
-let feedbackController = require("../controller/userFeedbackController");
-router.get("/", feedbackController.getFeedbacks);
-router.get("/:id", feedbackController.getFeedbackById);
-router.post("/", feedbackController.createUserFeedback);
+router.get("/", getFeedbacks);
+router.get("/:id", getFeedbackById);
+router.post("/", createUserFeedback);
 
 export default router;

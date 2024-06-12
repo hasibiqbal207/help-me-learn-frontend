@@ -1,8 +1,11 @@
-const uploadFile = require("../middleware/upload");
-const database = require("../database");
-const util = require("util");
-require("dotenv").config();
+import database from "../../database.js";
 
+import uploadFile from "../utils/upload.js";
+import util from "util";
+
+import dotenv from "dotenv";
+
+dotenv.config();
 const executeQuery = util.promisify(database.query).bind(database);
 
 export const upload = async (req, res) => {

@@ -1,6 +1,7 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
-require("dotenv").config();
+dotenv.config();
 
 module.exports = {
   //implement necessary auth for Student

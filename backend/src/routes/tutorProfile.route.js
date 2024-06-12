@@ -2,31 +2,40 @@ import express from "express";
 const router = express.Router();
 
 import {
-  createTutorProfileValidation,
-  updateTutorProfileValidation,
-} from "../utils/validation.js";
+  getTutorAbouInfoById,
+  getTutorOfferedCoursesById,
+  getTutorQualificationById,
+  searchTutorProfile,
+  getTutorsByStatus,
+  getReviewsById,
+  saveTutorInfo,
+  updateTutorInfo
+} from "../controllers/tutorProfile.controller.js";
+
+import validation from "../utils/validation.js";
+const { createTutorProfileValidation, updateTutorProfileValidation } =
+  validation;
 
 // Tutor Profile
-let tutorProfileController = require("../controller/TutorProfileController");
 
-router.get("/Info/:id", tutorProfileController.getTutorAbouInfoById);
-router.get("/courses/:id", tutorProfileController.getTutorOfferedCoursesById);
+router.get("/Info/:id", getTutorAbouInfoById);
+router.get("/courses/:id", getTutorOfferedCoursesById);
 router.get(
   "/qualification/:id",
-  tutorProfileController.getTutorQualificationById
+  getTutorQualificationById
 );
-router.get("/reviews/:id", tutorProfileController.getReviewsById);
-router.get("/", tutorProfileController.searchTutorProfile);
-router.get("/status", tutorProfileController.getTutorsByStatus);
+router.get("/reviews/:id", getReviewsById);
+router.get("/", searchTutorProfile);
+router.get("/status", getTutorsByStatus);
 router.post(
   "/",
   createTutorProfileValidation,
-  tutorProfileController.saveTutorInfo
+  saveTutorInfo
 );
 router.put(
   "/",
   updateTutorProfileValidation,
-  tutorProfileController.updateTutorInfo
+  updateTutorInfo
 );
 
 export default router;

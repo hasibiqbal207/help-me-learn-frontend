@@ -1,18 +1,22 @@
 import express from "express";
 const router = express.Router();
 
-// Validation
 import {
-  createPostValidation,
-  updatePostValidation,
-} from "../utils/validation.js";
+  searchPost,
+  getPost,
+  createPost,
+  updatePost,
+  deletePost,
+} from "../controllers/post.controller.js";
 
-let postController = require("../controller/postController");
+// Validation
+import validation from "../utils/validation.js";
+const { createPostValidation, updatePostValidation } = validation;
 
-router.get("/posts", postController.searchPost);
-router.get("/posts/:id", postController.getPost);
-router.post("/posts", createPostValidation, postController.createPost);
-router.put("/posts", updatePostValidation, postController.updatePost);
-router.delete("/posts/:id", postController.deletePost);
+router.get("/posts", searchPost);
+router.get("/posts/:id", getPost);
+router.post("/posts", createPostValidation, createPost);
+router.put("/posts", updatePostValidation, updatePost);
+router.delete("/posts/:id", deletePost);
 
 export default router;

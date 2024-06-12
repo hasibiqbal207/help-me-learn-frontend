@@ -1,6 +1,6 @@
-let database = require("../database");
-const { validationResult } = require("express-validator");
+import database from "../../database.js";
 
+import { validationResult } from "express-validator";
 // Create Department Method
 
 export const createDepartment = async (req, res) => {

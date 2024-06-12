@@ -12,7 +12,7 @@ import postRoute from "./post.route.js";
 import qualificationRoute from "./qualifications.route.js";
 import reviewRoute from "./review.route.js";
 import tutorPollRoute from "./tutorPoll.route.js";
-import tutorprofileRoute from "./tutorprofile.route.js";
+import tutorProfileRoute from "./tutorProfile.route.js";
 import uploadRoute from "./upload.route.js";
 import userRoute from "./user.route.js";
 
@@ -27,7 +27,7 @@ router.use("/posts", postRoute);
 router.use("/qualifications", qualificationRoute);
 router.use("/reviews", reviewRoute);
 router.use("/tutorpolls", tutorPollRoute);
-router.use("/tutors", tutorprofileRoute);
+router.use("/tutors", tutorProfileRoute);
 router.use("/uploads", uploadRoute);
 router.use("/users", userRoute);
 

@@ -1,8 +1,13 @@
-let database = require("../database");
-const uploadFile = require("../middleware/uploadImage");
-const { validationResult } = require("express-validator");
-require("dotenv").config();
-const util = require("util");
+import database from "../../database.js";
+
+import uploadFile from "../utils/upload.js";
+
+import { validationResult } from "express-validator";
+import dotenv from "dotenv";
+import util from "util";
+
+dotenv.config();
+
 
 const executeQuery = util.promisify(database.query).bind(database);
 

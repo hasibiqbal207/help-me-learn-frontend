@@ -1,10 +1,11 @@
 import express from "express";
 const router = express.Router();
 
-let fetchController = require("../controller/fetchFileController");
+import { isTutor } from "../middlewares/tutorAuth.js";
+import { file, image } from "../controllers/fetchFile.controller.js";
 
-import tutorAuth from "../middlewares/tutorAuth";
+router.get("/fetch/file/:id", file);
+router.get("/fetch/image", image);
+router.get("/fetch/image", isTutor, image);
 
-router.get("/fetch/file/:id", fetchController.file);
-router.get("/fetch/image", tutorAuth.isTutor, fetchController.image);
 export default router;

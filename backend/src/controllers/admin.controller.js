@@ -1,4 +1,5 @@
-const database = require("../database");
+import database from "../../database.js";
+
 
 export const deleteUser = (req, res, next) => {
   let userName = req.query.username;

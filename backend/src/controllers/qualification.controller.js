@@ -1,6 +1,6 @@
-let database = require("../database");
-const { validationResult } = require("express-validator");
-const util = require("util");
+import database from "../../database.js";
+import util from "util";
+import { validationResult } from "express-validator";
 
 const executeQuery = util.promisify(database.query).bind(database);
 

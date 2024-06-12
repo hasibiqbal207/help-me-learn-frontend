@@ -1,29 +1,36 @@
 import express from "express";
 const router = express.Router();
 
-// Validation
 import {
-  createQualificationValidation,
-  updateQualificationValidation,
-} from "../utils/validation.js";
+  getQualificationByTutorProfileId,
+  getQualificationById,
+  createQualification,
+  updateQualification,
+  deleteQualification,
+} from "../controllers/qualification.controller.js";
 
-let qualificationController = require("../controller/qualificationController");
+import validation from "../utils/validation.js";
+
+// Validation
+const { createQualificationValidation, updateQualificationValidation } =
+  validation;
+
 
 router.get(
   "/:tutorProfileId",
-  qualificationController.getQualificationByTutorProfileId
+  getQualificationByTutorProfileId
 );
-router.get("/:id", qualificationController.getQualificationById);
+router.get("/:id", getQualificationById);
 router.post(
   "/",
   createQualificationValidation,
-  qualificationController.createQualification
+  createQualification
 );
 router.put(
   "/",
   updateQualificationValidation,
-  qualificationController.updateQualification
+  updateQualification
 );
-router.delete("/:id", qualificationController.deleteQualification);
+router.delete("/:id", deleteQualification);
 
 export default router;

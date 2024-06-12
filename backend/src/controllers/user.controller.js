@@ -1,5 +1,6 @@
-let database = require("../database");
-const { validationResult } = require("express-validator");
+import database from "../../database.js";
+
+import { validationResult } from "express-validator";
 
 export const createUser = (req, res) => {
   const errors = validationResult(req);

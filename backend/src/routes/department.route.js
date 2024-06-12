@@ -1,22 +1,26 @@
 import express from "express";
 const router = express.Router();
 
-// Validation
-import {
-  createDeptValidation,
-  updateDeptValidation,
-} from "../utils/validation.js";
-
 // Department
-let departmentController = require("../controller/deptController");
+import {
+  getDepartments,
+  getDepartmentById,
+  createDepartment,
+  updateDepartment,
+  deleteDepartment,
+} from "../controllers/department.controller.js";
+import validation from "../utils/validation.js";
 
-router.get("/", departmentController.getDepartments);
-router.get("/:id", departmentController.getDepartmentById);
+// Validation
+const { createDeptValidation, updateDeptValidation } = validation;
 
-router.post("/", createDeptValidation, departmentController.createDepartment);
+router.get("/", getDepartments);
+router.get("/:id", getDepartmentById);
 
-router.put("/", updateDeptValidation, departmentController.updateDepartment);
+router.post("/", createDeptValidation, createDepartment);
 
-router.delete("/:id", departmentController.deleteDepartment);
+router.put("/", updateDeptValidation, updateDepartment);
+
+router.delete("/:id", deleteDepartment);
 
 export default router;

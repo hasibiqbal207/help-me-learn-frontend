@@ -1,19 +1,21 @@
 import express from "express";
 const router = express.Router();
 
+import {getReviews, getReviewById, createReview, updateReview, deleteReview} from "../controllers/review.controller.js"
 // Validation
-import {
+import validation from "../utils/validation.js";
+
+const {
   createReviewValidation,
   updateReviewValidation,
-} from "../utils/validation.js";
+} = validation;
 
 // Review
-let reviewController = require("../controller/reviewController");
 
-router.get("/", reviewController.getReviews);
-router.get("/:id", reviewController.getReviewById);
-router.post("/", createReviewValidation, reviewController.createReview);
-router.put("/", updateReviewValidation, reviewController.updateReview);
-router.delete("/:id", reviewController.deleteReview);
+router.get("/", getReviews);
+router.get("/:id", getReviewById);
+router.post("/", createReviewValidation, createReview);
+router.put("/", updateReviewValidation, updateReview);
+router.delete("/:id", deleteReview);
 
 export default router;

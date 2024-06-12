@@ -1,14 +1,19 @@
 import express from "express";
+
+import {
+  loginUser,
+  registerUser,
+} from "../controllers/authentication.controller.js";
+
+import { deleteUser } from "../controllers/admin.controller.js";
+import { isAdmin } from "../middlewares/adminAuth.js"
+
 const router = express.Router();
 
-// Login & Register
-let loginController = require("../controller/loginController");
+router.post("/register", registerUser);
+router.post("/login", loginUser);
 
-router.post("/register", loginController.registerUser);
-router.post("/login", loginController.loginUser);
-
-// Delete User
-let adminController = require("../controller/adminController");
-router.delete("/user", adminAuth.isAdmin, adminController.deleteUser);
+// Delete User only administrator access
+router.delete("/user", isAdmin, deleteUser);
 
 export default router;

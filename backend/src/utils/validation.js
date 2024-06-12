@@ -1,32 +1,32 @@
-const { body } = require("express-validator");
+import { body } from "express-validator";
 
-exports.createUserValidation = [
+const createUserValidation = [
   body("Email").notEmpty().isEmail(),
   body("UserType").notEmpty().isIn([100, 101, 102]),
   body("Status").notEmpty().isIn([100, 101, 102]),
 ];
 
-exports.updateUserValidation = [
+const updateUserValidation = [
   body("Id").notEmpty().isInt(),
   body("Email").notEmpty().isEmail(),
   body("UserType").notEmpty().isIn([100, 101, 102]),
   body("Status").notEmpty().isIn([100, 101, 102]),
 ];
 
-exports.createTutorProfileValidation = [body("UserId").notEmpty().isInt()];
+const createTutorProfileValidation = [body("UserId").notEmpty().isInt()];
 
-exports.updateTutorProfileValidation = [
+const updateTutorProfileValidation = [
   body("UserId").notEmpty().isInt(),
   body("Status").notEmpty().isIn([100, 101, 102]),
 ];
 
-exports.createPostValidation = [
+const createPostValidation = [
   body("SubjectName").notEmpty().isString(),
   body("Status").notEmpty().isIn([100, 101, 102]),
   body("RatePerHour").notEmpty(),
 ];
 
-exports.updatePostValidation = [
+const updatePostValidation = [
   body("Id").notEmpty().isInt(),
   body("TutorProfileId").notEmpty().isInt(),
   body("SubjectName").notEmpty().isString(),
@@ -34,49 +34,49 @@ exports.updatePostValidation = [
   body("RatePerHour").notEmpty(),
 ];
 
-exports.createReviewValidation = [
+const createReviewValidation = [
   body("UserId").notEmpty().isInt(),
   body("TutorProfileId").notEmpty().isInt(),
   body("Text").isString(),
 ];
 
-exports.createFeedbackValidation = [
+const createFeedbackValidation = [
   body("Subject").notEmpty().isString(),
   body("Description").notEmpty().isString(),
   body("UserId").notEmpty().isInt(),
 ];
 
-exports.updateReviewValidation = [
+const updateReviewValidation = [
   body("Id").notEmpty().isInt(),
   body("UserId").notEmpty().isInt(),
   body("TutorProfileId").notEmpty().isInt(),
   body("Text").isString(),
 ];
 
-exports.createPollValidation = [
+const createPollValidation = [
   body("Id").notEmpty().isInt(),
   body("CourseName").notEmpty().isString().isLength({ min: 1 }),
   body("Description").notEmpty().isString().isLength({ min: 1 }),
   body("Level").notEmpty().isString().isLength({ min: 1 }),
 ];
 
-exports.createDeptValidation = [
+const createDeptValidation = [
   body("Name").isString().notEmpty().isLength({ min: 1 }),
 ];
 
-exports.updateDeptValidation = [
+const updateDeptValidation = [
   body("Id").notEmpty().isInt(),
   body("Name").isString().notEmpty().isLength({ min: 1 }),
 ];
 
-exports.createCourseValidation = [
+const createCourseValidation = [
   body("DeptId").notEmpty().isInt(),
   body("CourseCode").notEmpty().isString().isLength({ min: 1 }),
   body("CourseName").notEmpty().isString().isLength({ min: 1 }),
   body("Level").notEmpty().isString().isLength({ min: 1 }),
 ];
 
-exports.updateCourseValidation = [
+const updateCourseValidation = [
   body("Id").notEmpty().isInt(),
   body("DeptId").notEmpty().isInt(),
   body("CourseCode").notEmpty().isString().isLength({ min: 1 }),
@@ -85,10 +85,29 @@ exports.updateCourseValidation = [
   body("Status").notEmpty().isIn([100, 101, 102]),
 ];
 
-exports.createQualificationValidation = [
+const createQualificationValidation = [
   body("SubjectName").notEmpty(),
   body("Description").notEmpty(),
   body("Grade").notEmpty(),
 ];
 
-exports.updateQualificationValidation = [body("Id").notEmpty().isInt()];
+const updateQualificationValidation = [body("Id").notEmpty().isInt()];
+
+export default {
+  createUserValidation,
+  updateUserValidation,
+  createTutorProfileValidation,
+  updateTutorProfileValidation,
+  createPostValidation,
+  updatePostValidation,
+  createReviewValidation,
+  createFeedbackValidation,
+  updateReviewValidation,
+  createPollValidation,
+  createDeptValidation,
+  updateDeptValidation,
+  createCourseValidation,
+  updateCourseValidation,
+  createQualificationValidation,
+  updateQualificationValidation,
+};

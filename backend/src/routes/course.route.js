@@ -1,22 +1,27 @@
 import express from "express";
-const router = express.Router();
+
+import {
+  getCourses,
+  getCourseById,
+  createCourse,
+  updateCourse,
+  deleteCourse,
+} from "../controllers/course.controller.js";
+import validation from "../utils/validation.js";
 
 // Validation
-import {
-  createCourseValidation,
-  updateCourseValidation,
-} from "../utils/validation.js";
+const { createCourseValidation, updateCourseValidation } = validation;
 
 // Course
-let courseController = require("../controller/courseController");
+const router = express.Router();
 
-router.get("/", courseController.getCourses);
-router.get("/:id", courseController.getCourseById);
+router.get("/", getCourses);
+router.get("/:id", getCourseById);
 
-router.post("/", createCourseValidation, courseController.createCourse);
+router.post("/", createCourseValidation, createCourse);
 
-router.put("/", updateCourseValidation, courseController.updateCourse);
+router.put("/", updateCourseValidation, updateCourse);
 
-router.delete("/:id", courseController.deleteCourse);
+router.delete("/:id", deleteCourse);
 
 export default router;

@@ -1,7 +1,9 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-let database = require("../database");
-require("dotenv").config();
+import database from "../../database.js";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import bcrypt from "bcryptjs";
+
+dotenv.config();
 
 /**
    * UserType  Enums:
