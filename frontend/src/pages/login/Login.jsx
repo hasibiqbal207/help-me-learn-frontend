@@ -7,10 +7,10 @@ const Login = () => {
   return (
     <div className="login-page">
       <div className="login-content">
-        {loginAlert && (
+        {/* {loginAlert && (
           <Alert variant={loginAlert.type}>{loginAlert.message}</Alert>
-        )}
-        <Form onSubmit={handleSubmit}>
+        )} */}
+        <Form>
           <Form.Control
             className="mt-3"
             type="email"

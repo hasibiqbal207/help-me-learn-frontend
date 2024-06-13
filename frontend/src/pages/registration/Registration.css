@@ -1,0 +1,29 @@
+.registration-content {
+    width: 400px;
+  }
+  
+  .registration-button {
+    width: 100%;
+  }
+  
+  .registration-logo {
+    margin-bottom: 20px;
+    width: 118px;
+  }
+  
+  .registration-page {
+    min-height: 100vh;
+    background-color: #fbfafb;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  
+  @media only screen and (max-width: 540px) {
+    .login-content {
+      width: 70%;
+    }
+  }
+  

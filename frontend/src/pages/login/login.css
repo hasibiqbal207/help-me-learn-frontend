@@ -1,29 +1,28 @@
 .login-content {
-    width: 350px;
+  width: 350px;
+}
+
+.login-button {
+  width: 100%;
+}
+
+.login-logo {
+  margin-bottom: 20px;
+  width: 118px;
+}
+
+.login-page {
+  min-height: 100vh;
+  background-color: #fbfafb;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+@media only screen and (max-width: 540px) {
+  .login-content {
+    width: 70%;
   }
-  
-  .login-button {
-    width: 100%;
-  }
-  
-  .login-logo {
-    margin-bottom: 20px;
-    width: 118px;
-  }
-  
-  .login-page {
-    min-height: 100vh;
-    background-color: #fbfafb;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
-  
-  @media only screen and (max-width: 540px) {
-    .login-content {
-      width: 70%;
-    }
-  }
-  
+}

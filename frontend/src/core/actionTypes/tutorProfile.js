@@ -1,0 +1,6 @@
+const prefix = "tutorprofile";
+
+export const FETCH_TUTORPROFILE_LIST = `${prefix}/GET_TUTORPROFILE_LIST`;
+export const SET_TUTORPROFILE_LIST_LOADING = `${prefix}/SET_TUTORPROFILE_LOADING`;
+export const GET_TUTORPROFILE_LIST_SUCCESS = `${prefix}/GET_TUTORPROFILE_SUCCESS`;
+export const GET_TUTORPROFILE_LIST_FAILED = `${prefix}/GET_TUTORPROFILE_FAILED`;
