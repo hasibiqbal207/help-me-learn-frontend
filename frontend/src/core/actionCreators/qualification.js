@@ -77,7 +77,7 @@ export const updateQualificationSuccess = (message, type = "success") => ({
   },
 });
 
-export const updateQualificationFailed = ( message, type = "danger") => ({
+export const updateQualificationFailed = (message, type = "danger") => ({
   type: UPDATE_QUALIFICATION_FAILED,
   payload: {
     updateAlert: {

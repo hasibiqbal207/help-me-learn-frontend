@@ -1,0 +1,1 @@
+export const getTutorsProfileList = (state) => state.manageTutorsProfile.data;
