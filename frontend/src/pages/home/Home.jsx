@@ -1,5 +1,4 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Page from "../../components/page/Page";
 import Admin from "./admin/index";
