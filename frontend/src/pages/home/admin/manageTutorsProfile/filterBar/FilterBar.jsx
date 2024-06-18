@@ -1,4 +1,3 @@
-// @flow
 import React, { useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -7,14 +6,14 @@ import { fetchTutorsProfileList } from "../../../../../core/actionCreators/manag
 
 export default function FilterBar() {
   const urlSearchParams = new URLSearchParams(useLocation().search);
-  var status = urlSearchParams.get("status");
+  let status = urlSearchParams.get("status");
 
   const dispatch = useDispatch();
 
-  var statusRef = useRef(null);
+  let statusRef = useRef(null);
 
   const [filters, setFilters] = useState({
-    status: status ? status : "-1",
+    status: status || "-1",
   });
 
   React.useEffect(() => {
@@ -22,7 +21,7 @@ export default function FilterBar() {
   }, [filters]);
 
   const handleSubmit = () => {
-    var newFilters = {
+    let newFilters = {
       status: statusRef.current.value,
     };
     setFilters(newFilters);
