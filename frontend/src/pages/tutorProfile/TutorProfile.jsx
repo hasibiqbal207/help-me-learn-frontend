@@ -6,7 +6,7 @@ import CourseList from "./courseList/CourseList";
 import ReviewList from "./reviewList/ReviewList";
 import QualificationList from "./qualificationList/QualificationList";
 import FileList from "./fileList/FileList";
-import Page from "../../componenets/page/Page";
+import Page from "../../components/page/Page";
 import Student from "./privilegedFeatures/Student";
 import Tutor from "./privilegedFeatures/Tutor";
 import { getUserType } from "../../core/selectors/user";

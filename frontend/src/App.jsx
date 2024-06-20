@@ -18,26 +18,21 @@ import TutorProfile from "./pages/tutorProfile/TutorProfile";
 function App() {
   return (
     <div>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Navigate to="/home" />} />
-          <Route path="/login" element={<Anonymous component={Login} />} />
-          <Route path="/home" element={<Home />} />
-          <Route
-            path="/users"
-            element={<Authorized component={ManageUsers} />}
-          />
-          <Route
-            path="/posts"
-            element={<Authorized component={ManageTutorsProfile} />}
-          />
-          <Route
-            path="/registration"
-            element={<Anonymous component={Registration} />}
-          />
-          <Route path="/tutor/:tutorId" element={<TutorProfile />} />
-        </Routes>
-      </Router>
+      <Routes>
+        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/login" element={<Anonymous component={Login} />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/users" element={<Authorized component={ManageUsers} />} />
+        <Route
+          path="/posts"
+          element={<Authorized component={ManageTutorsProfile} />}
+        />
+        <Route
+          path="/registration"
+          element={<Anonymous component={Registration} />}
+        />
+        <Route path="/tutor/:tutorId" element={<TutorProfile />} />
+      </Routes>
     </div>
   );
 }

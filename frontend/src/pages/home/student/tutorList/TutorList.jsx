@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { ListGroup } from "react-bootstrap";
 import TutorItem from "./TutorItem";
 import { getCourseSearchResult } from "../../../../core/selectors/offerCourse";
-import Paging from "../../../../components/paging/Paging";
+import Pagination from "../../../../components/pagination/Pagination.jsx";
 
 export default function TutorList() {
   const data = useSelector(getCourseSearchResult); //TODO: Change var to const
@@ -25,7 +25,7 @@ export default function TutorList() {
         })}
       </ListGroup>
       <br />
-      <Paging
+      <Pagination
         className="float-end"
         active={active}
         toggleActive={toggleActive}

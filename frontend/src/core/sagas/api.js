@@ -3,6 +3,24 @@ import axios from "axios";
 import { logoutUser, setLoginAlert } from "../actionCreators/user";
 import isOnline from "is-online";
 
+const DEFAULT_TIMEOUT = 1000000;
+
+const DEFAULT_HEADERS = {
+  "Content-Type": "application/json",
+  Accept: "application/json",
+  Authorization: undefined,
+};
+
+export const DEFAULT_API_OPTIONS = {
+  url: "",
+  method: "POST",
+  headers: DEFAULT_HEADERS,
+  timeout: DEFAULT_TIMEOUT,
+  useJwtSecret: false,
+};
+
+
+
 export function* executeApiCall(options) {
   const requestHeaders = { ...DEFAULT_HEADERS, ...options.headers };
 

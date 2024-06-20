@@ -8,7 +8,7 @@ import {
   Button,
   Row,
 } from "react-bootstrap";
-import "./Header.css";
+import "./header.css";
 import { isAuthenticated, getCurrentUser } from "../../core/selectors/user";
 import { logoutUser } from "../../core/actionCreators/user";
 import { NavLink } from "react-router-dom";

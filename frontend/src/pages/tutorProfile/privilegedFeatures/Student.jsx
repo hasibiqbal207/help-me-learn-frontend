@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Fab } from "react-tiny-fab";
-import Chat from "../../../components/chat/Chat";
+import Chat from "../../../components/chat/Chat.jsx";
 
 export default function Student(props) {
   let { tutorId } = props;

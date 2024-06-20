@@ -1,4 +1,4 @@
-const baseUrl = `${process.env.REACT_APP_API_URL}/api`;
+const baseUrl = `${import.meta.env.VITE_REACT_APP_API_URL}/api`;
 
 export const loginApi = `${baseUrl}/login`;
 export const registerApi = `${baseUrl}/register`;
@@ -15,8 +15,8 @@ export const allStudentListApi = `${baseUrl}/users/?UserType=102`;
 export const allTutorListApi = `${baseUrl}/users/?UserType=101`;
 export const pendingTutorListApi = `${baseUrl}/courses?Status=100`;
 
-export const socketIOUrl = `${process.env.REACT_APP_API_URL}`;
-export const filesApi = `${process.env.REACT_APP_API_URL}`;
+export const socketIOUrl = `${import.meta.env.VITE_REACT_APP_API_URL}`;
+export const filesApi = `${import.meta.env.VITE_REACT_APP_API_URL}`;
 
 export const fetchApi = `${baseUrl}/fetch/file`;
 
