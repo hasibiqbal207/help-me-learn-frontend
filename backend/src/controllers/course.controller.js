@@ -1,4 +1,4 @@
-import database from "../../database.js";
+import database from "../../config/database.js";
 
 import { validationResult } from "express-validator";
 
@@ -51,11 +51,15 @@ export const getCourses = async (req, res) => {
 
 // Get Course By Id Method
 export const getCourseById = async (req, res) => {
+  console.log(req.params.id);
+
   // Query
   database.query(
     "SELECT id, courseCode, courseName, departmentId, `level`, status FROM hm_course WHERE id = ?",
     [req.params.id],
+
     (err, result) => {
+      console.log(result);
       if (err) res.status(400).send(`Request Error: ${err}`);
       else res.status(200).json(result);
     }

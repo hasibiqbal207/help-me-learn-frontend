@@ -1,4 +1,4 @@
-import database from "../../database.js";
+import database from "../../config/database.js";
 import util from "util";
 
 const executeQuery = util.promisify(database.query).bind(database);

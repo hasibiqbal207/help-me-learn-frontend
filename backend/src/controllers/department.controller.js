@@ -1,4 +1,4 @@
-import database from "../../database.js";
+import database from "../../config/database.js";
 
 import { validationResult } from "express-validator";
 // Create Department Method

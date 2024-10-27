@@ -7,7 +7,7 @@ import http from 'http'
 import dotenv from 'dotenv'
 import { fileURLToPath } from 'url';
 // Imports from Files
-import routes from './src/routes/index.js'
+import routes from './routes/index.js'
 
 
 const app = express()
@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 // dotenv config
 dotenv.config();
 
-const port = 8080;
+const port = 3000;
 
 
 const jsonParser = bodyParser.json();
