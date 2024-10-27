@@ -10,7 +10,7 @@ import { isAdmin } from "../middlewares/adminAuth.js"
 
 const router = express.Router();
 
-router.post("/register", registerUser);
+router.post("/registerUser", registerUser);
 router.post("/login", loginUser);
 
 // Delete User only administrator access

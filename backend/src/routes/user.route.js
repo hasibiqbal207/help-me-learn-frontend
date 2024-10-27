@@ -11,6 +11,7 @@ const {createUserValidation, updateUserValidation} = validation;
 
 
 router.get("/", getUsers);
+
 router.get("/:id", getUserById);
 
 router.post("/", createUserValidation, createUser);

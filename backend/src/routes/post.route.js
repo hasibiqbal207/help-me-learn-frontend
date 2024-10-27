@@ -13,10 +13,10 @@ import {
 import validation from "../utils/validation.js";
 const { createPostValidation, updatePostValidation } = validation;
 
-router.get("/posts", searchPost);
-router.get("/posts/:id", getPost);
-router.post("/posts", createPostValidation, createPost);
-router.put("/posts", updatePostValidation, updatePost);
-router.delete("/posts/:id", deletePost);
+router.post("/", createPostValidation, createPost);
+router.put("/", updatePostValidation, updatePost);
+router.delete("/:id", deletePost);
+router.get("/", searchPost);
+router.get("/:id", getPost);
 
 export default router;

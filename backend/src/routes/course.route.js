@@ -15,12 +15,13 @@ const { createCourseValidation, updateCourseValidation } = validation;
 // Course
 const router = express.Router();
 
-router.get("/", getCourses);
-router.get("/:id", getCourseById);
-
 router.post("/", createCourseValidation, createCourse);
 
+router.get("/:id", getCourseById);
+
 router.put("/", updateCourseValidation, updateCourse);
+
+router.get("/", getCourses);
 
 router.delete("/:id", deleteCourse);
 
