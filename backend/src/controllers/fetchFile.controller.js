@@ -1,36 +1,32 @@
-import database from "../../config/database.js";
-
-import dotenv from "dotenv";
-
-dotenv.config();
+import * as fileService from "../services/file.service.js";
 
 export const file = async (req, res) => {
-  let id = req.params.id;
-  database.execute(
-    "SELECT F.* FROM hm_file F INNER JOIN hm_tutor_profile T on (F.tutorProfileId = T.id and T.userId = ?);",
-    [id],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-        res.status(500).send({ message: "Something went wrong" });
-      } else {
-        res.send({ message: "Success", data: result });
-      }
-    }
-  );
+  try {
+    const userId = req.params.id;
+    const result = await fileService.getTutorFiles(userId);
+    res.status(200).json({ 
+      message: "Success", 
+      data: result 
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ 
+      message: "Something went wrong" 
+    });
+  }
 };
 
 export const image = async (req, res) => {
-  database.execute(
-    "SELECT * FROM `helpmelearn`.`hm_image` WHERE `userId`= ?",
-    [req.userid],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-        res.status(500).send({ message: "Something went wrong" });
-      } else {
-        res.send({ message: "Success", data: result });
-      }
-    }
-  );
+  try {
+    const result = await fileService.getUserImages(req.userid);
+    res.status(200).json({ 
+      message: "Success", 
+      data: result 
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ 
+      message: "Something went wrong" 
+    });
+  }
 };

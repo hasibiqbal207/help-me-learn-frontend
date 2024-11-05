@@ -31,7 +31,6 @@ connection.connect((err) => {
   if (err) {
     throw err;
   }
-  console.log("Connected to the database as id " + connection.threadId);
   console.log("Database connected");
 });
 

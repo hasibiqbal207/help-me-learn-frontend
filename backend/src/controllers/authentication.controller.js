@@ -1,7 +1,6 @@
-import database from "../../config/database.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import bcrypt from "bcryptjs";
+import * as authService from "../services/authentication.service.js";
 
 dotenv.config();
 
@@ -18,109 +17,76 @@ dotenv.config();
    * Status Enums:
       100 - Pending
       101 - Approved
-      102 - Rejected
+      102 - Rejected-
    */
   //Login check
 export const loginUser = async (req, res) => {
-  let { email, password } = req.body;
-
-  database.execute(
-    "SELECT * FROM `helpmelearn`.`hm_user` WHERE `email`= ?",
-    [email],
-    function (err, result, fields) {
-      if (err) throw err;
-
-      if (result.length === 0) {
-        res.json({ message: "User Do Not Exists" });
-      } else if(result[0].status == 100 || result[0].status == 102){
-        var errorMessage = result[0].status == 100? "Pending":"Rejected";
-        res.json({message: `User registration is: ${errorMessage}`});
-      }
-      else {
-        let db_email = result[0].email;
-        let db_password = result[0].password;
-
-        let payload = {
-          id: result[0].id,
-          email: result[0].email,
-          user_type: result[0].usertype,
-          status: result[0].status,
-        };
-
-        bcrypt.compare(password, db_password, (err, r) => {
-          if (err) throw err;
-          if (r) {
-            const token = jwt.sign(payload, process.env.JWT_PRIVATE_KEY, {
-              expiresIn: process.env.TOKEN_EXPIRE,
-            });
-
-            res.json({ id: result[0].id, email: result[0].email, token: token });
-          } else {
-            {
-              res.json({ message: "Invalid Credentials!" });
-            }
-          }
-        });
-      }
+  try {
+    const { email, password } = req.body;
+    
+    const users = await authService.findUserByEmail(email);
+    
+    if (users.length === 0) {
+      return res.json({ message: "User Do Not Exists" });
     }
-  );
+    
+    const user = users[0];
+    if (user.status == 100 || user.status == 102) {
+      const errorMessage = user.status == 100 ? "Pending" : "Rejected";
+      return res.json({ message: `User registration is: ${errorMessage}` });
+    }
+
+    const isPasswordValid = await authService.comparePasswords(password, user.password);
+    
+    if (isPasswordValid) {
+      const payload = {
+        id: user.id,
+        email: user.email,
+        user_type: user.usertype,
+        status: user.status,
+      };
+
+      const token = jwt.sign(payload, process.env.JWT_PRIVATE_KEY, {
+        expiresIn: process.env.TOKEN_EXPIRE,
+      });
+
+      return res.json({ id: user.id, email: user.email, token: token });
+    } else {
+      return res.json({ message: "Invalid Credentials!" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
 };
 
+export const registerUser = async (req, res) => {
+  try {
+    const { first_name, last_name, usertype, email, password, status, gender } = req.body;
 
-export const registerUser = (req, res) => {
-  let {first_name, last_name, usertype, email, password, status, gender } =
-    req.body;
-
-  bcrypt.hash(password, 10, (err, encrypted_password) => {
-    if (err) throw err;
-    database.execute(
-      "SELECT * FROM `helpmelearn`.`hm_user` WHERE `email`= ?",
-      [email],
-      function (err, result, fields) {
-        console.log(result.length);
-
-        if (result.length === 0) {
-          database.execute(
-            "INSERT INTO `helpmelearn`.`hm_user` (`firstName`, `lastName`, `usertype`, `email`, `password`, `status`, gender) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            [
-              first_name,
-              last_name,
-              usertype,
-              email,
-              encrypted_password,
-              status,
-              gender,
-            ],
-            (err, result) => {
-              if (err) console.log(err);
-              else {
-                if(usertype == 101){
-                database.execute(
-                  "INSERT INTO `helpmelearn`.`hm_tutor_profile` (`userId`, `rating`) VALUES (?, 0)",
-                  [
-                    result.insertId,
-                  ],
-                  (err, result) => {
-                    if (err) console.log(err);
-                    else {
-                      // INSERT INTO `helpmelearn`.`tutorprofile` (`first_name`, `last_name`, `subject`, `age`, `level`, `rate`, `rating`, `numOfStudents`) VALUES ('salman', 'haydar', '', '', '', '', '', '');
+    const existingUsers = await authService.findUserByEmail(email);
     
-                      res.json({ message: "User Created" });
-                    }
-                  }
-                );
-                // res.json({ message: "User Created" });
-              }
-              else {
-                res.json({ message: "User Created" });
-              }
-            }
-            }
-          );
-        } else {
-          res.json({ message: "User Already Exists!" });
-        }
-      }
-    );
-  });
+    if (existingUsers.length > 0) {
+      return res.json({ message: "User Already Exists!" });
+    }
+
+    const encrypted_password = await authService.hashPassword(password);
+    
+    const result = await authService.createUser({
+      first_name,
+      last_name,
+      usertype,
+      email,
+      encrypted_password,
+      status,
+      gender
+    });
+
+    if (usertype == 101) {
+      await authService.createTutorProfile(result.insertId);
+    }
+
+    return res.json({ message: "User Created" });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
 };

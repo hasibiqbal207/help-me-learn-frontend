@@ -1,100 +1,78 @@
-import database from "../../config/database.js";
-
 import { validationResult } from "express-validator";
+import * as courseService from "../services/course.service.js";
 
-// Create Course Method
 export const createCourse = async (req, res) => {
-  // Validate Request
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  let { CourseCode, CourseName, DeptId, Level } = req.body;
-  let Status = 100;
-
-  database.query(
-    "INSERT INTO hm_course (courseCode, courseName, departmentId, `level`, status) VALUES ( ?, ?, ?, ?, ?)",
-    [CourseCode, CourseName, DeptId, Level, Status],
-    (err) => {
-      if (err) res.status(400).send(`Request Error: ${err}`);
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-  );
 
-  // Get Course Id
-  database.query("SELECT LAST_INSERT_ID() as id;", (err, result) => {
-    if (err)
-      res
-        .status(400)
-        .send(
-          `Successfully added Course, but unable get record Id. Request Error: ${err}`
-        );
-    else res.status(201).json({ message: `Course Id: ${result[0].id}` });
-  });
+    const courseData = {
+      ...req.body,
+      status: 100
+    };
+
+    await courseService.insertCourse(courseData);
+    const newCourseId = await courseService.getLastInsertId();
+    
+    res.status(201).json({ message: `Course Id: ${newCourseId}` });
+  } catch (error) {
+    res.status(400).send(`Request Error: ${error}`);
+  }
 };
 
-// Get Courses Method
 export const getCourses = async (req, res) => {
-  let joinQuery = "";
-  if (req.query.Status !== undefined) {
-    joinQuery += `status = ${database.escape(req.query.Status)}`;
+  try {
+    const courses = await courseService.getAllCourses(req.query.Status);
+    res.status(200).json(courses);
+  } catch (error) {
+    res.status(400).send(`Request Error: ${error}`);
   }
-
-  let dbQuery =
-    "SELECT id, courseCode, courseName, departmentId, `level`, status FROM hm_course";
-  if (joinQuery !== "") dbQuery += ` where ${joinQuery}`;
-  database.query(dbQuery, (err, result) => {
-    if (err) res.status(400).send(`Request Error: ${err}`);
-    else res.status(200).json(result);
-  });
 };
 
-// Get Course By Id Method
 export const getCourseById = async (req, res) => {
-  console.log(req.params.id);
-
-  // Query
-  database.query(
-    "SELECT id, courseCode, courseName, departmentId, `level`, status FROM hm_course WHERE id = ?",
-    [req.params.id],
-
-    (err, result) => {
-      console.log(result);
-      if (err) res.status(400).send(`Request Error: ${err}`);
-      else res.status(200).json(result);
+  try {
+    const courseId = parseInt(req.params.id, 10);
+    const result = await courseService.getCourseById(courseId);
+    
+    if (result.length === 0) {
+      return res.status(404).send("Course not found");
     }
-  );
-};
-
-// Delete Course By Id Method
-export const deleteCourse = async (req, res) => {
-  let id = req.params.id;
-  database.query(`DELETE FROM hm_course WHERE id = ?;`, [id], (err, result) => {
-    if (err) res.status(400).send(`Request Error: ${err}`);
-    else
-      res
-        .status(200)
-        .json({ message: `Course Id:${id} deleted successfully.` });
-  });
-};
-
-// Update Course
-export const updateCourse = (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).send("Server error");
   }
-  let { Id, CourseCode, CourseName, DeptId, Level, Status } = req.body;
-  var date = new Date().toISOString().split("T")[0];
+};
 
-  database.query(
-    "UPDATE hm_course SET courseCode = ?, courseName = ?, departmentId = ?, `level` = ?, status = ? WHERE id = ?",
-    [CourseCode, CourseName, DeptId, Level, Status, Id],
-    (err) => {
-      if (err) res.status(400).send(`Request Error: ${err}`);
-      else {
-        res.status(204).json({ message: "Course Details Updated" });
-      }
+export const deleteCourse = async (req, res) => {
+  try {
+    const courseId = req.params.id;
+    await courseService.deleteCourseById(courseId);
+    res.status(200).json({ message: `Course Id:${courseId} deleted successfully.` });
+  } catch (error) {
+    res.status(400).send(`Request Error: ${error}`);
+  }
+};
+
+export const updateCourse = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-  );
+
+    const result = await courseService.updateCourseById(req.body);
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).send("Course not found");
+    }
+    
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Database query error:", error);
+    res.status(400).send(`Request Error: ${error}`);
+  }
 };

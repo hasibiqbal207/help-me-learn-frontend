@@ -45,42 +45,42 @@
 //   },
 
 //   updatePost: async (req, res) => {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ errors: errors.array() });
-//     }
-
-//     let {
-//       Id,
-//       Description,
-//       TutorProfileId,
-//       Status,
-//       Language,
-//       SubjectName,
-//       RatePerHour,
-//       ExperinceYears,
-//       AvailableTime,
-//     } = req.body;
-
-//     var date = new Date().toISOString().split("T")[0];
-//     database.query(
-//       "UPDATE hm_post SET description=?, tutorProfileId=?, status=?, `language`=?, subjectName=?, ratePerHour=?, modifiedDateTime=?, experienceYears=?, availableTime=? WHERE id = ?;",
-//       [
-//         Description,
-//         TutorProfileId,
-//         Status,
-//         Language,
-//         SubjectName,
-//         RatePerHour,
-//         date,
-//         ExperinceYears,
-//         AvailableTime,
-//         Id,
-//       ],
-//       (err, result) => {
-//         if (err) res.status(400).send(`Response Error: ${err}`);
-//         else res.status(204).json({ message: "Post Details Updated" });
+//     try {
+//       const errors = validationResult(req);
+//       if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
 //       }
-//     );
+
+//       const {
+//         id,
+//         courseName,
+//         description,
+//         level,
+//       } = req.body;
+
+//       const date = new Date().toISOString().split("T")[0];
+
+//       database.query(
+//         "UPDATE hm_post SET description=?, tutorProfileId=?, status=?, `language`=?, subjectName=?, ratePerHour=?, modifiedDateTime=?, experienceYears=?, availableTime=? WHERE id = ?;",
+//         [
+//           description,
+//           id,
+//           Status,
+//           Language,
+//           SubjectName,
+//           RatePerHour,
+//           date,
+//           ExperinceYears,
+//           AvailableTime,
+//           id,
+//         ],
+//         (err, result) => {
+//           if (err) res.status(400).send(`Response Error: ${err}`);
+//           else res.status(204).json({ message: "Post Details Updated" });
+//         }
+//       );
+//     } catch (error) {
+//       res.status(400).send(`Response Error: ${error}`);
+//     }
 //   },
 // };

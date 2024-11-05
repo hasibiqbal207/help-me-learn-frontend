@@ -1,56 +1,43 @@
-import database from "../../config/database.js";
-
 import { validationResult } from "express-validator";
-import util from "util";
-
-const executeQuery = util.promisify(database.query).bind(database);
+import * as feedbackService from "../services/feedback.service.js";
 
 export const createUserFeedback = async (req, res) => {
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  let { Subject, Description, UserId } = req.body;
-  var date = new Date();
-
-  database.query(
-    "INSERT INTO hm_feedback(subject, description, createdDateTime, userId) VALUES ( ?, ?, ?, ?)",
-    [Subject, Description, date, UserId],
-    (err) => {
-      if (err) res.status(400).send(`Response Error: ${err}`);
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-  );
 
-  database.query("SELECT LAST_INSERT_ID() as id;", (err, result) => {
-    if (err)
-      res
-        .status(400)
-        .send(
-          `Successfully added Feedback, but unable get record Id. Request Error: ${err}`
-        );
-    else res.status(201).json({ message: `Feedback Id: ${result[0].id}` });
-  });
+    const feedbackData = {
+      subject: req.body.subject,
+      description: req.body.description,
+      userId: req.body.userId,
+      date: new Date()
+    };
+
+    await feedbackService.createFeedback(feedbackData);
+    const newFeedbackId = await feedbackService.getLastInsertId();
+    
+    res.status(201).json({ message: `Feedback Id: ${newFeedbackId}` });
+  } catch (error) {
+    res.status(400).send(`Response Error: ${error}`);
+  }
 };
 
 export const getFeedbacks = async (req, res) => {
-  database.query(
-    "SELECT id, subject, description FROM hm_feedback",
-    (err, result) => {
-      if (err) res.status(400).send(`Response Error: ${err}`);
-      else res.status(200).json(result);
-    }
-  );
+  try {
+    const feedbacks = await feedbackService.getAllFeedbacks();
+    res.status(200).json(feedbacks);
+  } catch (error) {
+    res.status(400).send(`Response Error: ${error}`);
+  }
 };
 
 export const getFeedbackById = async (req, res) => {
-  database.query(
-    "SELECT id, subject, description FROM hm_feedback WHERE id = ?",
-    [req.params.id],
-    (err, result) => {
-      if (err) res.status(400).send(`Request Error: ${err}`);
-      else res.status(200).json(result);
-    }
-  );
+  try {
+    const feedback = await feedbackService.getFeedbackById(req.params.id);
+    res.status(200).json(feedback);
+  } catch (error) {
+    res.status(400).send(`Request Error: ${error}`);
+  }
 };

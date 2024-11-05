@@ -1,91 +1,69 @@
-import database from "../../config/database.js";
-import util from "util";
 import { validationResult } from "express-validator";
-
-const executeQuery = util.promisify(database.query).bind(database);
-
-// Get Qualification By Id Method
-export const getQualificationById = async (req, res) => {
-  // Query
-  database.query(
-    "SELECT * FROM hm_qualification WHERE id = ?",
-    [req.params.id],
-    (err, result) => {
-      if (err) res.status(400).send(`Request Error: ${err}`);
-      else res.status(200).json(result);
-    }
-  );
-};
+import * as qualificationService from "../services/qualification.service.js";
 
 export const createQualification = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  let { SubjectName, Description, Grade, UserId } = req.body;
-
   try {
-    var result = await executeQuery(
-      "SELECT * FROM hm_tutor_profile T WHERE T.userId = ?",
-      [UserId]
-    );
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-    var tutorProfileId = result[0].id;
+    const tutorProfile = await qualificationService.getTutorProfileByUserId(req.body.userId);
+    const tutorProfileId = tutorProfile[0].id;
 
-    result = await executeQuery(
-      `INSERT INTO hm_qualification (subjectName, description, grade, tutorProfileId) VALUES ( ?, ?, ?, ?);`,
-      [SubjectName, Description, Grade, tutorProfileId]
-    );
-    let qualificationId = result.insertId;
+    const qualificationData = {
+      ...req.body,
+      tutorProfileId
+    };
 
-    await executeQuery(
-      "UPDATE hm_tutor_profile SET status = 100 WHERE id = ?;",
-      [tutorProfileId]
-    );
+    const result = await qualificationService.createQualification(qualificationData);
+    await qualificationService.updateTutorStatus(tutorProfileId);
 
-    res.json({ message: `Qualification Id: ${qualificationId}` });
+    res.json({ message: `Qualification Id: ${result.insertId}` });
   } catch (error) {
     res.status(500).json({ message: error });
   }
 };
 
+export const getQualificationById = async (req, res) => {
+  try {
+    const result = await qualificationService.getQualificationById(req.params.id);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).send(`Request Error: ${error}`);
+  }
+};
+
 export const getQualificationByTutorProfileId = async (req, res) => {
-  database.query(
-    "SELECT id, subjectName, description, grade FROM hm_qualification WHERE tutorProfileId = ?",
-    [req.params.tutorProfileId],
-    (err, result) => {
-      if (err) console.log(err);
-      else res.json(result);
-    }
-  );
+  try {
+    const result = await qualificationService.getQualificationsByTutorProfileId(req.params.tutorProfileId);
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 export const deleteQualification = async (req, res) => {
-  let id = req.params.id;
-  database.query(
-    `DELETE FROM hm_qualification WHERE id = ?;`,
-    [id],
-    (err, result) => {
-      res.json({ message: `Qualification Id:${id} deleted successfully.` });
-    }
-  );
+  try {
+    await qualificationService.deleteQualificationById(req.params.id);
+    res.json({ 
+      message: `Qualification Id:${req.params.id} deleted successfully.` 
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
-export const updateQualification = (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  let { SubjectName, Qualification, Grade } = req.body;
-
-  database.query(
-    `UPDATE hm_qualification SET subjectName = ?, description= ?, grade = ? WHERE id = ?`,
-    [SubjectName, Qualification, Grade, Id],
-    (err) => {
-      if (err) console.log(err);
-      else {
-        res.json({ message: "Qualification Updated" });
-      }
+export const updateQualification = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-  );
+
+    await qualificationService.updateQualificationById(req.body);
+    res.json({ message: "Qualification Updated" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };

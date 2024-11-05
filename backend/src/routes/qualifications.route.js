@@ -15,10 +15,10 @@ import validation from "../utils/validation.js";
 const { createQualificationValidation, updateQualificationValidation } =
   validation;
 
-router.get("/:tutorProfileId", getQualificationByTutorProfileId);
-router.get("/:id", getQualificationById);
 router.post("/", createQualificationValidation, createQualification);
 router.put("/", updateQualificationValidation, updateQualification);
 router.delete("/:id", deleteQualification);
+router.get("/:tutorProfileId", getQualificationByTutorProfileId);
+router.get("/:id", getQualificationById);
 
 export default router;

@@ -1,102 +1,107 @@
-import database from "../../config/database.js";
-
 import { validationResult } from "express-validator";
+import * as userService from "../services/user.service.js";
 
-export const createUser = (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  let { FirstName, LastName, UserType, Email, Password, Status, Gender } =
-    req.body;
-
-  database.query(
-    "INSERT INTO hm_user (firstName, lastName, usertype, email, password, status, gender) VALUES ( ?, ?, ?, ?, ?, ?, ?)",
-    [FirstName, LastName, UserType, Email, Password, Status, Gender],
-    (err, result) => {
-      if (err) console.log(err);
+export const createUser = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-  );
 
-  database.query("SELECT LAST_INSERT_ID() as id;", (err, result) => {
-    res.json({ message: `User Id: ${result[0].id}` });
-  });
+    const userData = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      userType: req.body.userType,
+      email: req.body.email,
+      password: req.body.password,
+      status: req.body.status,
+      gender: req.body.gender
+    };
+
+    await userService.createNewUser(userData);
+    const newUserId = await userService.getLastInsertId();
+    
+    res.status(201).json({ message: `User Id: ${newUserId}` });
+  } catch (error) {
+    res.status(500).json({ 
+      message: "Error creating user", 
+      error: error.message 
+    });
+  }
 };
 
 export const getUsers = async (req, res) => {
-  let joinQuery = "";
-  if (req.query.UserType !== undefined)
-    joinQuery += `usertype = ${database.escape(req.query.UserType)}`;
+  try {
+    const filters = {
+      userType: req.query.userType,
+      status: req.query.status,
+      lastName: req.query.lastName,
+      firstName: req.query.firstName,
+      email: req.query.email
+    };
 
-  if (req.query.Status !== undefined) {
-    if (joinQuery != "") joinQuery += " and ";
-
-    joinQuery += `Status = ${database.escape(req.query.Status)}`;
+    const users = await userService.getUsersByFilters(filters);
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).json({ 
+      message: "Error retrieving users", 
+      error: error.message 
+    });
   }
-
-  if (req.query.LastName !== undefined) {
-    if (joinQuery != "") joinQuery += " and ";
-
-    joinQuery += `lastName = ${database.escape(req.query.LastName)}`;
-  }
-
-  if (req.query.FirstName !== undefined) {
-    if (joinQuery != "") joinQuery += " and ";
-
-    joinQuery += `firstName = ${database.escape(req.query.FirstName)}`;
-  }
-
-  if (req.query.Email !== undefined) {
-    if (joinQuery != "") joinQuery += " and ";
-
-    joinQuery += `email = ${database.escape(req.query.Email)}`;
-  }
-
-  let query =
-    "SELECT id, firstName, lastName, usertype, email, status, gender FROM hm_user";
-  if (joinQuery !== "") query += ` where ${joinQuery}`;
-  database.query(query, (err, result) => {
-    if (err) res.status(400).send(`Response Error: ${err}`);
-    else res.status(200).json(result);
-  });
 };
 
 export const getUserById = async (req, res) => {
-  let query =
-    "SELECT firstName, lastName, usertype, email, status, gender FROM hm_user WHERE id = ?";
-
-  database.query(query, [req.params.id], (err, result) => {
-    if (err) res.status(400).send(`Response Error: ${err}`);
-    else res.status(200).json(result);
-  });
+  try {
+    const user = await userService.getUserById(req.params.id);
+    
+    if (!user || user.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    res.status(200).json(user[0]);
+  } catch (error) {
+    res.status(400).json({ 
+      message: "Error retrieving user", 
+      error: error.message 
+    });
+  }
 };
 
-export const updateUser = (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  let { Id, FirstName, LastName, UserType, Email, Status, Gender } = req.body;
-
-  database.query(
-    "UPDATE hm_user SET firstName = ?, lastName = ?, usertype = ?, email = ?, status = ?, gender = ? WHERE id= ?",
-    [FirstName, LastName, UserType, Email, Status, Gender, Id],
-    (err) => {
-      if (err) res.status(400).send(`Response Error: ${err}`);
-      else res.status(204).json({ message: "User Details Updated" });
+export const updateUser = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-  );
+
+    const result = await userService.updateUser(req.body);
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    res.status(200).json({ message: "User Details Updated" });
+  } catch (error) {
+    res.status(400).json({ 
+      message: "Error updating user", 
+      error: error.message 
+    });
+  }
 };
 
 export const deleteUser = async (req, res) => {
-  let id = req.params.id;
-  database.query(
-    "DELETE FROM hm_user WHERE id = ?",
-    [id],
-    (err, result, fields) => {
-      if (err) res.status(400).send(`Response Error: ${err}`);
-      else res.status(200).json({ message: "User deleted successfully." });
+  try {
+    const result = await userService.deleteUserById(req.params.id);
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
     }
-  );
+    
+    res.status(200).json({ message: "User deleted successfully." });
+  } catch (error) {
+    res.status(400).json({ 
+      message: "Error deleting user", 
+      error: error.message 
+    });
+  }
 };

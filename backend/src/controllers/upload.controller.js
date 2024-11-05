@@ -1,148 +1,27 @@
-import database from "../../config/database.js";
-
+import * as uploadService from "../services/upload.service.js";
 import uploadFile from "../utils/upload.js";
-import util from "util";
-
-import dotenv from "dotenv";
-
-dotenv.config();
-const executeQuery = util.promisify(database.query).bind(database);
 
 export const upload = async (req, res) => {
   try {
-
     await uploadFile(req, res);
 
-    if (req.file == undefined) {
+    if (!req.file) {
       return res.status(400).send({ message: "Please upload a file!" });
     }
 
-    var result = await executeQuery('SELECT id FROM hm_tutor_profile WHERE userId = ?', [req.userid]);
-    var tutorProfileId = result[0].id;
-
-    await executeQuery(
-      "UPDATE hm_tutor_profile SET status = 100 WHERE id = ?;",
-      [tutorProfileId]
-    );
-
-    if(req.file.mimetype === "application/pdf") {
-      
-        database.execute("SELECT * FROM `helpmelearn`.`hm_file` WHERE `tutorProfileId`= ?",
-        [tutorProfileId],
-        (err, result) => {
-            if(err) {
-                console.log(err);
-                res.status(500).send({message:"Something went wrong"});
-            }
-            else if(result.length >= 1) {
-              database.execute("DELETE FROM `helpmelearn`.`hm_file` WHERE (`tutorProfileId` = ?)",
-              [tutorProfileId],(err, result)=> {
-                    if(err) {
-                      console.log(err);
-                      res.status(500).send({message:"Something went wrong"});
-                  }
-                  else {
-                    database.execute("INSERT INTO `helpmelearn`.`hm_file` ( `tutorProfileId`, `fileName`, `fileType`, `fileExtension`, `filePath`) VALUES (?, ?, ?, ?, ?)", 
-                    [tutorProfileId, 
-                    req.file.originalname, 
-                    0, 
-                    "pdf", 
-                    "resources/static/"+req.file.originalname], 
-                    (err, result) => {
-
-                      if (err){ 
-                        console.log(err);
-                        res.status(500).send({message: "Somethid went wrong during inserting into DB"});
-                      }
-
-                      res.status(200).send({
-                        message: "Uploaded the file successfully: " + req.file.originalname,
-                      });
-                    });
-                  }
-              });
-            }
-            else {
-
-              database.execute("INSERT INTO `helpmelearn`.`hm_file` ( `tutorProfileId`, `fileName`, `fileType`, `fileExtension`, `filePath`) VALUES (?, ?, ?, ?, ?)", 
-              [tutorProfileId, 
-              req.file.originalname, 
-              0, 
-              "pdf", 
-              "resources/static/"+req.file.originalname], 
-              (err, result) => {
-
-                if (err){ 
-                  console.log(err);
-                  res.status(500).send({message: "Somethid went wrong during inserting into DB"});
-                }
-
-                res.status(200).send({
-                  message: "Uploaded the file successfully: " + req.file.originalname,
-                });
-              });
-            }
-
-        });
-
+    const tutorProfileId = await uploadService.getTutorProfileId(req.userid);
+    if (!tutorProfileId) {
+      return res.status(404).send({ message: "Tutor profile not found" });
     }
-    else if(req.file.mimetype === "image/jpg" || req.file.mimetype === "image/jpeg" || req.file.mimetype === "image/png") {
-       
-        var today = new Date();
-        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-        var dateTime = date+' '+time;
-        console.log(req.userid);
-        database.execute("SELECT * FROM `helpmelearn`.`hm_image` WHERE `userId`= ?",
-        [req.userid],
-        (err, result) => {
-            if(err) {
-                console.log(err);
-                res.status(500).send({message:"Something went wrong"});
-            }
-            else if(result.length >= 1) {
-              database.execute("DELETE FROM `helpmelearn`.`hm_image` WHERE (`userId` = ?)",
-              [req.userid],(err, result)=> {
-                    if(err) {
-                      console.log(err);
-                      res.status(500).send({message:"Something went wrong"});
-                  }
-                  else {
-                    database.execute("INSERT INTO `helpmelearn`.`hm_image` ( `imagePath`, `date`, `userId`, `createdDateTime`, `modifiedDateTime`) VALUES (?, ?, ?, ?, ?)", 
-                    ["resources/static/"+req.file.originalname, 
-                    dateTime, 
-                    req.userid, 
-                    dateTime, 
-                    dateTime], 
-                    (err, result) => {
-                        if (err){ console.log(err);
-                            res.status(500).send({message: "Somethid went wrong during inserting into DB"});
-                        }
-                        res.status(200).send({
-                            message: "Uploaded the image successfully: " + req.file.originalname,
-                            });
-                    });
-                  }
-              });
-            }
-            else {
 
-              database.execute("INSERT INTO `helpmelearn`.`hm_image` ( `imagePath`, `date`, `userId`, `createdDateTime`, `modifiedDateTime`) VALUES (?, ?, ?, ?, ?)", 
-              ["resources/static/"+req.file.originalname, 
-              dateTime, 
-              req.userid, 
-              dateTime, 
-              dateTime], 
-              (err, result) => {
-                  if (err){ console.log(err);
-                      res.status(500).send({message: "Somethid went wrong during inserting into DB"});
-                  }
-                  res.status(200).send({
-                      message: "Uploaded the image successfully: " + req.file.originalname,
-                    });
-              });
-            }
-        });
+    await uploadService.updateTutorStatus(tutorProfileId);
+
+    if (req.file.mimetype === "application/pdf") {
+      await handlePdfUpload(req, res, tutorProfileId);
+    } else if (isImageFile(req.file.mimetype)) {
+      await handleImageUpload(req, res);
+    } else {
+      return res.status(400).send({ message: "Unsupported file type" });
     }
 
   } catch (err) {
@@ -150,5 +29,65 @@ export const upload = async (req, res) => {
       message: `Could not upload the file: ${req.file?.originalname}. ${err}`,
     });
   }
+};
+
+const handlePdfUpload = async (req, res, tutorProfileId) => {
+  try {
+    const existingFile = await uploadService.getExistingFile(tutorProfileId);
+
+    if (existingFile.length >= 1) {
+      await uploadService.deleteExistingFile(tutorProfileId);
+    }
+
+    const fileData = {
+      tutorProfileId,
+      fileName: req.file.originalname,
+      filePath: "resources/static/" + req.file.originalname
+    };
+
+    await uploadService.insertFile(fileData);
+
+    res.status(200).send({
+      message: "Uploaded the file successfully: " + req.file.originalname,
+    });
+  } catch (error) {
+    throw new Error("Error handling PDF upload: " + error.message);
+  }
+};
+
+const handleImageUpload = async (req, res) => {
+  try {
+    const dateTime = getCurrentDateTime();
+    const existingImage = await uploadService.getExistingImage(req.userid);
+
+    if (existingImage.length >= 1) {
+      await uploadService.deleteExistingImage(req.userid);
+    }
+
+    const imageData = {
+      imagePath: "resources/static/" + req.file.originalname,
+      userId: req.userid,
+      dateTime
+    };
+
+    await uploadService.insertImage(imageData);
+
+    res.status(200).send({
+      message: "Uploaded the image successfully: " + req.file.originalname,
+    });
+  } catch (error) {
+    throw new Error("Error handling image upload: " + error.message);
+  }
+};
+
+const isImageFile = (mimetype) => {
+  return ["image/jpg", "image/jpeg", "image/png"].includes(mimetype);
+};
+
+const getCurrentDateTime = () => {
+  const today = new Date();
+  const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+  const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+  return date + ' ' + time;
 };
 

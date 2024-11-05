@@ -1,17 +1,12 @@
-import database from "../../config/database.js";
+import * as adminService from "../services/admin.service.js";
 
-
-export const deleteUser = (req, res, next) => {
-  let userName = req.query.username;
+export const deleteUser = async (req, res) => {
+  const userName = req.query.username;
+  
   try {
-    database.execute(
-      "DELETE FROM `helpmelearn`.`hm_user` WHERE (`username` = ?)",
-      [userName],
-      (err, result) => {
-        res.json({ success: true, message: "User deleted succesfully!" });
-      }
-    );
+    await adminService.removeUserFromDatabase(userName);
+    res.json({ success: true, message: "User deleted successfully!" });
   } catch (error) {
-    res.json({ success: false, message: "Something went wrong" });
+    res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
