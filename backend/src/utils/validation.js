@@ -1,97 +1,97 @@
 import { body } from "express-validator";
 
 const createUserValidation = [
-  body("Email").notEmpty().isEmail(),
-  body("UserType").notEmpty().isIn([100, 101, 102]),
-  body("Status").notEmpty().isIn([100, 101, 102]),
+  body("email").notEmpty().isEmail(),
+  body("userType").notEmpty().isIn([100, 101, 102]),
+  body("status").notEmpty().isIn([100, 101, 102]),
 ];
 
 const updateUserValidation = [
-  body("Id").notEmpty().isInt(),
-  body("Email").notEmpty().isEmail(),
-  body("UserType").notEmpty().isIn([100, 101, 102]),
-  body("Status").notEmpty().isIn([100, 101, 102]),
+  body("id").notEmpty().isInt(),
+  body("email").notEmpty().isEmail(),
+  body("userType").notEmpty().isIn([100, 101, 102]),
+  body("status").notEmpty().isIn([100, 101, 102]),
 ];
 
-const createTutorProfileValidation = [body("UserId").notEmpty().isInt()];
+const createTutorProfileValidation = [body("userId").notEmpty().isInt()];
 
 const updateTutorProfileValidation = [
-  body("UserId").notEmpty().isInt(),
-  body("Status").notEmpty().isIn([100, 101, 102]),
+  body("userId").notEmpty().isInt(),
+  body("status").notEmpty().isIn([100, 101, 102]),
 ];
 
 const createPostValidation = [
-  body("SubjectName").notEmpty().isString(),
-  body("Status").notEmpty().isIn([100, 101, 102]),
-  body("RatePerHour").notEmpty(),
+  body("subjectName").notEmpty().isString(),
+  body("status").notEmpty().isIn([100, 101, 102]),
+  body("ratePerHour").notEmpty(),
 ];
 
 const updatePostValidation = [
-  body("Id").notEmpty().isInt(),
-  body("TutorProfileId").notEmpty().isInt(),
-  body("SubjectName").notEmpty().isString(),
-  body("Status").notEmpty().isIn([100, 101, 102]),
-  body("RatePerHour").notEmpty(),
+  body("id").notEmpty().isInt(),
+  body("tutorProfileId").notEmpty().isInt(),
+  body("subjectName").notEmpty().isString(),
+  body("status").notEmpty().isIn([100, 101, 102]),
+  body("ratePerHour").notEmpty(),
 ];
 
 const createReviewValidation = [
-  body("UserId").notEmpty().isInt(),
-  body("TutorProfileId").notEmpty().isInt(),
-  body("Text").isString(),
+  body("userId").notEmpty().isInt(),
+  body("tutorProfileId").notEmpty().isInt(),
+  body("text").isString(),
 ];
 
 const createFeedbackValidation = [
-  body("Subject").notEmpty().isString(),
-  body("Description").notEmpty().isString(),
-  body("UserId").notEmpty().isInt(),
+  body("subject").notEmpty().isString(),
+  body("description").notEmpty().isString(),
+  body("userId").notEmpty().isInt(),
 ];
 
 const updateReviewValidation = [
-  body("Id").notEmpty().isInt(),
-  body("UserId").notEmpty().isInt(),
-  body("TutorProfileId").notEmpty().isInt(),
-  body("Text").isString(),
+  body("id").notEmpty().isInt(),
+  body("userId").notEmpty().isInt(),
+  body("tutorProfileId").notEmpty().isInt(),
+  body("text").isString(),
 ];
 
 const createPollValidation = [
-  body("Id").notEmpty().isInt(),
-  body("CourseName").notEmpty().isString().isLength({ min: 1 }),
-  body("Description").notEmpty().isString().isLength({ min: 1 }),
-  body("Level").notEmpty().isString().isLength({ min: 1 }),
+  body("id").notEmpty().isInt(),
+  body("courseName").notEmpty().isString().isLength({ min: 1 }),
+  body("description").notEmpty().isString().isLength({ min: 1 }),
+  body("level").notEmpty().isString().isLength({ min: 1 }),
 ];
 
 const createDeptValidation = [
-  body("Name").isString().notEmpty().isLength({ min: 1 }),
+  body("name").isString().notEmpty().isLength({ min: 1 }),
 ];
 
 const updateDeptValidation = [
-  body("Id").notEmpty().isInt(),
-  body("Name").isString().notEmpty().isLength({ min: 1 }),
+  body("id").notEmpty().isInt(),
+  body("name").isString().notEmpty().isLength({ min: 1 }),
 ];
 
 const createCourseValidation = [
-  body("DeptId").notEmpty().isInt(),
-  body("CourseCode").notEmpty().isString().isLength({ min: 1 }),
-  body("CourseName").notEmpty().isString().isLength({ min: 1 }),
-  body("Level").notEmpty().isString().isLength({ min: 1 }),
+  body("departmentId").notEmpty().isInt(),
+  body("courseCode").notEmpty().isString().isLength({ min: 1 }),
+  body("courseName").notEmpty().isString().isLength({ min: 1 }),
+  body("level").notEmpty().isString().isLength({ min: 1 }),
 ];
 
 const updateCourseValidation = [
-  body("Id").notEmpty().isInt(),
-  body("DeptId").notEmpty().isInt(),
-  body("CourseCode").notEmpty().isString().isLength({ min: 1 }),
-  body("CourseName").notEmpty().isString().isLength({ min: 1 }),
-  body("Level").notEmpty().isString().isLength({ min: 1 }),
-  body("Status").notEmpty().isIn([100, 101, 102]),
+  body("id").notEmpty().isInt(),
+  body("departmentId").notEmpty().isInt(),
+  body("courseCode").notEmpty().isString().isLength({ min: 1 }),
+  body("courseName").notEmpty().isString().isLength({ min: 1 }),
+  body("level").notEmpty().isString().isLength({ min: 1 }),
+  body("status").notEmpty().isIn([100, 101, 102]),
 ];
 
 const createQualificationValidation = [
-  body("SubjectName").notEmpty(),
-  body("Description").notEmpty(),
-  body("Grade").notEmpty(),
+  body("subjectName").notEmpty(),
+  body("description").notEmpty(),
+  body("grade").notEmpty(),
 ];
 
-const updateQualificationValidation = [body("Id").notEmpty().isInt()];
+const updateQualificationValidation = [body("id").notEmpty().isInt()];
 
 export default {
   createUserValidation,

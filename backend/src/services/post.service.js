@@ -1,45 +1,42 @@
-import database from "../../config/database.js";
+import database from "../../config/database.config.js";
 import util from "util";
 
 const executeQuery = util.promisify(database.query).bind(database);
 
 export const getTutorProfileByUserId = async (userId) => {
-  return executeQuery(
-    "SELECT * FROM hm_tutor_profile T WHERE T.userId = ?;",
-    [userId]
-  );
+  return executeQuery("SELECT * FROM hm_tutor_profile T WHERE T.userId = ?;", [
+    userId,
+  ]);
 };
 
 export const createNewPost = async (postData) => {
   const {
-    Level,
-    Description,
+    description,
+    status,
+    language,
+    subjectName,
+    ratePerHour,
+    experienceYears,
+    availableTime,
     tutorProfileId,
-    Status,
-    Language,
-    SubjectName,
-    RatePerHour,
     date,
-    ExperinceYears,
     isActive,
-    AvailableTime
   } = postData;
 
   return executeQuery(
-    "INSERT INTO hm_post(level, description, tutorProfileId, status, `language`, subjectName, ratePerHour, createdDateTime, modifiedDateTime, experienceYears, isActive, availableTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    "INSERT INTO hm_post(description, tutorProfileId, status, `language`, subjectName, ratePerHour, createdDateTime, modifiedDateTime, experienceYears, isActive, availableTime) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     [
-      Level,
-      Description,
+      description,
       tutorProfileId,
-      Status,
-      Language,
-      SubjectName,
-      RatePerHour,
+      status,
+      language,
+      subjectName,
+      ratePerHour,
       date,
       date,
-      ExperinceYears,
+      experienceYears,
       isActive,
-      AvailableTime,
+      availableTime,
     ]
   );
 };
@@ -66,7 +63,7 @@ export const updatePostById = async (postData) => {
     date,
     experienceYears,
     availableTime,
-    id
+    id,
   } = postData;
 
   return executeQuery(
@@ -126,4 +123,4 @@ export const searchPosts = async (queryParams) => {
   }
 
   return executeQuery(dbQuery);
-}; 
+};

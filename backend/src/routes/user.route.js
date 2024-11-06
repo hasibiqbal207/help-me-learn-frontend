@@ -14,7 +14,7 @@ router.get("/", getUsers);
 
 router.get("/:id", getUserById);
 
-router.post("/", createUserValidation, createUser);
+// router.post("/", createUserValidation, createUser);
 
 router.put("/", updateUserValidation, updateUser);
 

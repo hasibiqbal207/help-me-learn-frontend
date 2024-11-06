@@ -1,12 +1,12 @@
-import database from "../../config/database.js";
+import database from "../../config/database.config.js";
 
 export const insertCourse = async (courseData) => {
-  const { CourseCode, CourseName, DeptId, Level, Status } = courseData;
+  const { courseCode, courseName, departmentId, level, status } = courseData;
   
   return new Promise((resolve, reject) => {
     database.query(
       "INSERT INTO hm_course (courseCode, courseName, departmentId, `level`, status) VALUES ( ?, ?, ?, ?, ?)",
-      [CourseCode, CourseName, DeptId, Level, Status],
+      [courseCode, courseName, departmentId, level, status],
       (err, result) => {
         if (err) reject(err);
         resolve(result);
@@ -65,12 +65,12 @@ export const deleteCourseById = async (courseId) => {
 };
 
 export const updateCourseById = async (courseData) => {
-  const { id, courseCode, courseName, deptId, level, status } = courseData;
+  const { id, courseCode, courseName, departmentId, level, status } = courseData;
   
   return new Promise((resolve, reject) => {
     database.query(
       "UPDATE hm_course SET courseCode = ?, courseName = ?, departmentId = ?, `level` = ?, status = ? WHERE id = ?",
-      [courseCode, courseName, deptId, level, status, id],
+      [courseCode, courseName, departmentId, level, status, id],
       (err, result) => {
         if (err) reject(err);
         resolve(result);

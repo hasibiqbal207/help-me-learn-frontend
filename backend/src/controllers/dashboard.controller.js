@@ -7,18 +7,18 @@ export const dashboard = async (req, res) => {
 
     res.json({
       usersByStatus: [
-        { name: "Approved", value: userResult[0].approved },
-        { name: "Pending", value: userResult[0].pending },
-        { name: "Rejected", value: userResult[0].rejected },
+        { name: "approved", value: userResult[0].approved },
+        { name: "pending", value: userResult[0].pending },
+        { name: "rejected", value: userResult[0].rejected },
       ],
       usersByType: [
-        { name: "Student", value: userResult[0].studentCount },
-        { name: "Tutor", value: userResult[0].tutorCount },
+        { name: "student", value: userResult[0].studentCount },
+        { name: "tutor", value: userResult[0].tutorCount },
       ],
       postByStatus: [
-        { name: "Approved", value: postResult[0].approved },
-        { name: "Pending", value: postResult[0].pending },
-        { name: "Rejected", value: postResult[0].rejected },
+        { name: "approved", value: postResult[0].approved },
+        { name: "pending", value: postResult[0].pending },
+        { name: "rejected", value: postResult[0].rejected },
       ]
     });
   } catch (error) {

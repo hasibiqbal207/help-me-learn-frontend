@@ -1,4 +1,4 @@
-import database from "../../config/database.js";
+import database from "../../config/database.config.js";
 import bcrypt from "bcryptjs";
 
 export const findUserByEmail = async (email) => {

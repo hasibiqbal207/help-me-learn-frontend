@@ -7,17 +7,17 @@ export const createQualification = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
+    
     const tutorProfile = await qualificationService.getTutorProfileByUserId(req.body.userId);
     const tutorProfileId = tutorProfile[0].id;
-
+    
     const qualificationData = {
       ...req.body,
       tutorProfileId
     };
 
     const result = await qualificationService.createQualification(qualificationData);
-    await qualificationService.updateTutorStatus(tutorProfileId);
+    // await qualificationService.updateTutorStatus(tutorProfileId);
 
     res.json({ message: `Qualification Id: ${result.insertId}` });
   } catch (error) {
@@ -28,6 +28,7 @@ export const createQualification = async (req, res) => {
 export const getQualificationById = async (req, res) => {
   try {
     const result = await qualificationService.getQualificationById(req.params.id);
+  
     res.status(200).json(result);
   } catch (error) {
     res.status(400).send(`Request Error: ${error}`);

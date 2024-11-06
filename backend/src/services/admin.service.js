@@ -1,4 +1,5 @@
-import database from "../../config/database.js";
+import database from "../../config/database.config.js";
+
 
 export const removeUserFromDatabase = async (username) => {
   return new Promise((resolve, reject) => {

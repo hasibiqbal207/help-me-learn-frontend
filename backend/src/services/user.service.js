@@ -1,4 +1,4 @@
-import database from "../../config/database.js";
+import database from "../../config/database.config.js";
 import util from "util";
 
 const executeQuery = util.promisify(database.query).bind(database);
@@ -62,11 +62,11 @@ export const getUserById = async (id) => {
 };
 
 export const updateUser = async (userData) => {
-  const { Id, FirstName, LastName, UserType, Email, Status, Gender } = userData;
+  const { id, firstName, lastName, userType, email, status, gender } = userData;
   
   return executeQuery(
     "UPDATE hm_user SET firstName = ?, lastName = ?, usertype = ?, email = ?, status = ?, gender = ? WHERE id = ?",
-    [FirstName, LastName, UserType, Email, Status, Gender, Id]
+    [firstName, lastName, userType, email, status, gender, id]
   );
 };
 

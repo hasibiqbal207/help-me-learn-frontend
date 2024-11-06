@@ -1,4 +1,4 @@
-import database from "../../config/database.js";
+import database from "../../config/database.config.js";
 
 export const createFeedback = async (feedbackData) => {
   const { subject, description, userId, date } = feedbackData;

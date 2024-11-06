@@ -1,14 +1,14 @@
-import database from "../../config/database.js";
+import database from "../../config/database.config.js";
 import util from "util";
 
 const executeQuery = util.promisify(database.query).bind(database);
 
 export const createNewPoll = async (pollData) => {
-  const { CourseName, Description, Level, TutorProfileId } = pollData;
+  const { courseName, description, level, tutorProfileId } = pollData;
   
   return executeQuery(
     "INSERT INTO hm_poll (coursename, description, level, tutorProfileId) VALUES (?, ?, ?, ?)",
-    [CourseName, Description, Level, TutorProfileId]
+    [courseName, description, level, tutorProfileId]
   );
 };
 
@@ -28,31 +28,31 @@ export const getPollsByTutorId = async (tutorProfileId) => {
 
 export const updatePollById = async (pollData) => {
   const { 
-    Id, 
-    Description, 
-    TutorProfileId, 
-    Status, 
-    Language, 
-    SubjectName, 
-    RatePerHour, 
-    ExperinceYears, 
-    AvailableTime,
+    id, 
+    description, 
+    tutorProfileId, 
+    status, 
+    language, 
+    subjectName, 
+    ratePerHour, 
+    experienceYears, 
+    availableTime,
     date 
   } = pollData;
 
   return executeQuery(
-    "UPDATE hm_post SET description=?, tutorProfileId=?, status=?, `language`=?, subjectName=?, ratePerHour=?, modifiedDateTime=?, experienceYears=?, availableTime=? WHERE id = ?",
+    "UPDATE hm_poll SET description=?, tutorProfileId=?, status=?, `language`=?, subjectName=?, ratePerHour=?, modifiedDateTime=?, experienceYears=?, availableTime=? WHERE id = ?",
     [
-      Description,
-      TutorProfileId,
-      Status,
-      Language,
-      SubjectName,
-      RatePerHour,
+      description,
+      tutorProfileId,
+      status,
+      language,
+      subjectName,
+      ratePerHour,
       date,
-      ExperinceYears,
-      AvailableTime,
-      Id
+      experienceYears,
+      availableTime,
+      id
     ]
   );
 }; 

@@ -11,6 +11,7 @@ export const createPost = async (req, res) => {
     const tutorProfile = await postService.getTutorProfileByUserId(req.body.userId);
     const tutorProfileId = tutorProfile[0].id;
 
+
     const postData = {
       ...req.body,
       tutorProfileId,
@@ -19,7 +20,7 @@ export const createPost = async (req, res) => {
     };
 
     const result = await postService.createNewPost(postData);
-    await postService.updateTutorStatus(tutorProfileId);
+    // await postService.updateTutorStatus(tutorProfileId);
 
     res.status(201).json({ message: `Post Id: ${result.insertId}` });
   } catch (error) {

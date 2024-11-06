@@ -1,4 +1,4 @@
-import database from "../../config/database.js";
+import database from "../../config/database.config.js";
 import util from "util";
 
 const executeQuery = util.promisify(database.query).bind(database);
@@ -27,10 +27,13 @@ export const updateTutorStatus = async (tutorProfileId) => {
 };
 
 export const getQualificationById = async (id) => {
-  return executeQuery(
+  console.log('I am here')
+  const result = executeQuery(
     "SELECT * FROM hm_qualification WHERE id = ?",
     [id]
   );
+  console.log(result)
+
 };
 
 export const getQualificationsByTutorProfileId = async (tutorProfileId) => {
@@ -48,10 +51,10 @@ export const deleteQualificationById = async (id) => {
 };
 
 export const updateQualificationById = async (qualificationData) => {
-  const { Id, SubjectName, Qualification, Grade } = qualificationData;
+  const { id, subjectName, description, grade } = qualificationData;
   
   return executeQuery(
     "UPDATE hm_qualification SET subjectName = ?, description = ?, grade = ? WHERE id = ?",
-    [SubjectName, Qualification, Grade, Id]
+    [subjectName, description, grade, id]
   );
 };

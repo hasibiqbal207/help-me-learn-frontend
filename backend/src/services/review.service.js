@@ -1,4 +1,4 @@
-import database from "../../config/database.js";
+import database from "../../config/database.config.js";
 import util from "util";
 
 const executeQuery = util.promisify(database.query).bind(database);
@@ -63,10 +63,10 @@ export const deleteReviewById = async (id) => {
 };
 
 export const updateReview = async (reviewData) => {
-  const { Id, Text, Rating, UserId, TutorProfileId, date } = reviewData;
+  const { id, text, rating, userId, tutorProfileId, date } = reviewData;
   
   return executeQuery(
     "UPDATE hm_review SET text=?, rating=?, modifiedDateTime=?, userId=?, tutorProfileId=? WHERE id = ?",
-    [Text, Rating, date, UserId, TutorProfileId, Id]
+    [text, rating, date, userId, tutorProfileId, id]
   );
 }; 

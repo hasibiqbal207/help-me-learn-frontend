@@ -10,39 +10,41 @@ dotenv.config();
       101 - Tutor
       102 - Student
    */
-  //Registering User
+//Registering User
 
-
-  /**
+/**
    * Status Enums:
       100 - Pending
       101 - Approved
       102 - Rejected-
    */
-  //Login check
+//Login check
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     const users = await authService.findUserByEmail(email);
-    
+
     if (users.length === 0) {
       return res.json({ message: "User Do Not Exists" });
     }
-    
+
     const user = users[0];
     if (user.status == 100 || user.status == 102) {
       const errorMessage = user.status == 100 ? "Pending" : "Rejected";
       return res.json({ message: `User registration is: ${errorMessage}` });
     }
 
-    const isPasswordValid = await authService.comparePasswords(password, user.password);
-    
+    const isPasswordValid = await authService.comparePasswords(
+      password,
+      user.password
+    );
+
     if (isPasswordValid) {
       const payload = {
         id: user.id,
         email: user.email,
-        user_type: user.usertype,
+        userType: user.usertype,
         status: user.status,
       };
 
@@ -55,38 +57,43 @@ export const loginUser = async (req, res) => {
       return res.json({ message: "Invalid Credentials!" });
     }
   } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 
 export const registerUser = async (req, res) => {
   try {
-    const { first_name, last_name, usertype, email, password, status, gender } = req.body;
+    const { firstName, lastName, userType, email, password, status, gender } =
+      req.body;
 
     const existingUsers = await authService.findUserByEmail(email);
-    
+
     if (existingUsers.length > 0) {
       return res.json({ message: "User Already Exists!" });
     }
 
-    const encrypted_password = await authService.hashPassword(password);
-    
+    const encryptedPassword = await authService.hashPassword(password);
+
     const result = await authService.createUser({
-      first_name,
-      last_name,
-      usertype,
+      firstName,
+      lastName,
+      userType,
       email,
-      encrypted_password,
+      encryptedPassword,
       status,
-      gender
+      gender,
     });
 
-    if (usertype == 101) {
+    if (userType == 101) {
       await authService.createTutorProfile(result.insertId);
     }
 
     return res.json({ message: "User Created" });
   } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };

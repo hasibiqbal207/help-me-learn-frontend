@@ -1,6 +1,7 @@
 import { validationResult } from "express-validator";
 import * as userService from "../services/user.service.js";
 
+// [ Check ]
 export const createUser = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -25,43 +26,6 @@ export const createUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ 
       message: "Error creating user", 
-      error: error.message 
-    });
-  }
-};
-
-export const getUsers = async (req, res) => {
-  try {
-    const filters = {
-      userType: req.query.userType,
-      status: req.query.status,
-      lastName: req.query.lastName,
-      firstName: req.query.firstName,
-      email: req.query.email
-    };
-
-    const users = await userService.getUsersByFilters(filters);
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(400).json({ 
-      message: "Error retrieving users", 
-      error: error.message 
-    });
-  }
-};
-
-export const getUserById = async (req, res) => {
-  try {
-    const user = await userService.getUserById(req.params.id);
-    
-    if (!user || user.length === 0) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    
-    res.status(200).json(user[0]);
-  } catch (error) {
-    res.status(400).json({ 
-      message: "Error retrieving user", 
       error: error.message 
     });
   }
@@ -105,3 +69,41 @@ export const deleteUser = async (req, res) => {
     });
   }
 };
+
+export const getUsers = async (req, res) => {
+  try {
+    const filters = {
+      userType: req.query.userType,
+      status: req.query.status,
+      lastName: req.query.lastName,
+      firstName: req.query.firstName,
+      email: req.query.email
+    };
+
+    const users = await userService.getUsersByFilters(filters);
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).json({ 
+      message: "Error retrieving users", 
+      error: error.message 
+    });
+  }
+};
+
+export const getUserById = async (req, res) => {
+  try {
+    const user = await userService.getUserById(req.params.id);
+    
+    if (!user || user.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    res.status(200).json(user[0]);
+  } catch (error) {
+    res.status(400).json({ 
+      message: "Error retrieving user", 
+      error: error.message 
+    });
+  }
+};
+
