@@ -9,15 +9,14 @@ import validation from "../utils/validation.js";
 
 const {createUserValidation, updateUserValidation} = validation;
 
-
-router.get("/", getUsers);
-
-router.get("/:id", getUserById);
-
 // router.post("/", createUserValidation, createUser);
 
 router.put("/", updateUserValidation, updateUser);
 
 router.delete("/:id", deleteUser);
+
+router.get("/", getUsers);
+
+router.get("/:id", getUserById);
 
 export default router;

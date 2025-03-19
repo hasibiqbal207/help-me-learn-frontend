@@ -15,6 +15,7 @@ export const findUserByEmail = async (email) => {
 };
 
 export const createUser = async (userData) => {
+  console.log(userData);
   const { firstName, lastName, userType, email, encryptedPassword, status, gender } = userData;
   
   return new Promise((resolve, reject) => {

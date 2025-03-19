@@ -16,9 +16,9 @@ export const isTutor = (req, res, next) => {
     try {
       const decodedToken = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
       if (
-        decodedToken.user_type === 101 ||
-        decodedToken.user_type === 100 ||
-        decodedToken.user_type === 102
+        decodedToken.userType === 101 ||
+        decodedToken.userType === 100 ||
+        decodedToken.userType === 102
       ) {
         req.userid = decodedToken.id;
         next();

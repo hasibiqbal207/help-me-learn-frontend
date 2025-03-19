@@ -92,32 +92,32 @@ export const getPostById = async (id) => {
 
 export const searchPosts = async (queryParams) => {
   let joinQuery = "";
-  const { TutorProfileId, Status, RatePerHour, SubjectName } = queryParams;
+  const { tutorProfileId, status, ratePerHour, subjectName } = queryParams;
 
-  if (TutorProfileId !== undefined) {
-    joinQuery += `tutorProfileId = ${database.escape(TutorProfileId)}`;
+  if (tutorProfileId !== undefined) {
+    joinQuery += `tutorProfileId = ${database.escape(tutorProfileId)}`;
   }
 
-  if (Status !== undefined) {
+  if (status !== undefined) {
     if (joinQuery !== "") joinQuery += " and ";
-    joinQuery += `status = ${database.escape(Status)}`;
+    joinQuery += `status = ${database.escape(status)}`;
   }
 
-  if (RatePerHour !== undefined) {
+  if (ratePerHour !== undefined) {
     if (joinQuery !== "") joinQuery += " and ";
-    joinQuery += `ratePerHour = ${database.escape(RatePerHour)}`;
+    joinQuery += `ratePerHour = ${database.escape(ratePerHour)}`;
   }
 
-  if (SubjectName !== undefined) {
+  if (subjectName !== undefined) {
     if (joinQuery !== "") joinQuery += " and ";
-    joinQuery += `MATCH(subjectName) AGAINST (${database.escape(SubjectName)})`;
+    joinQuery += `MATCH(subjectName) AGAINST (${database.escape(subjectName)})`;
   }
 
   let dbQuery =
     "SELECT hm_post.id, hm_post.description, hm_post.tutorProfileId, hm_post.status, hm_post.language, hm_post.subjectName, hm_post.ratePerHour, hm_post.createdDateTime, hm_post.modifiedDateTime, hm_post.experienceYears, hm_post.isActive, hm_post.availableTime, hm_user.firstName, hm_user.lastName FROM hm_post" +
     " INNER JOIN hm_tutor_profile ON (hm_tutor_profile.id = hm_post.tutorProfileId)" +
     " INNER JOIN hm_user ON (hm_user.id = hm_tutor_profile.userId)";
-
+  
   if (joinQuery !== "") {
     dbQuery += ` where ${joinQuery}`;
   }

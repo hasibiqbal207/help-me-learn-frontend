@@ -66,16 +66,17 @@ export const loginUser = async (req, res) => {
 export const registerUser = async (req, res) => {
   try {
     const { firstName, lastName, userType, email, password, status, gender } =
-      req.body;
-
+    req.body;
+    
     const existingUsers = await authService.findUserByEmail(email);
-
+    
     if (existingUsers.length > 0) {
       return res.json({ message: "User Already Exists!" });
     }
-
+    
     const encryptedPassword = await authService.hashPassword(password);
-
+    
+    console.log('From Controller', req.body);
     const result = await authService.createUser({
       firstName,
       lastName,

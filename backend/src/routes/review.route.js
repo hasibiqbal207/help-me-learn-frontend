@@ -23,6 +23,6 @@ router.delete("/:id", deleteReview);
 
 router.get("/", getReviews);
 
-router.get("/:id", getReviewById);
+router.get("/:tutorProfileId", getReviewById);
 
 export default router;

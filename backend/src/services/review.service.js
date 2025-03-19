@@ -27,7 +27,8 @@ export const getReviewsByTutorId = async (tutorProfileId) => {
   const query = `
     SELECT hmu.firstName, hmu.lastName, hmr.text, hmr.rating, hmr.createdDateTime 
     FROM helpmelearn.hm_review hmr
-    INNER JOIN helpmelearn.hm_user hmu ON (hmr.userId = hmu.id AND hmr.tutorProfileId = ?)
+    INNER JOIN helpmelearn.hm_user hmu ON hmr.userId = hmu.id
+    WHERE hmr.tutorProfileId = ?
   `;
   
   return executeQuery(query, [tutorProfileId]);

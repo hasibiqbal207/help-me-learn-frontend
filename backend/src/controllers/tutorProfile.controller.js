@@ -4,7 +4,8 @@ import uploadFile from "../utils/upload.js";
 
 export const getTutorAbouInfoById = async (req, res) => {
   try {
-    const result = await tutorProfileService.getTutorAboutInfo(req.params.id);
+    console.log(req.query.userId)
+    const result = await tutorProfileService.getTutorAboutInfo(req.query.userId);
     res.json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });

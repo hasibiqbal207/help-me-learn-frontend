@@ -18,7 +18,7 @@ const { createQualificationValidation, updateQualificationValidation } =
 router.post("/", createQualificationValidation, createQualification);
 router.put("/", updateQualificationValidation, updateQualification);
 router.delete("/:id", deleteQualification);
-router.get("/:tutorProfileId", getQualificationByTutorProfileId);
 router.get("/:id", getQualificationById);
+router.get("/tutorProfile/:id", getQualificationByTutorProfileId);
 
 export default router;

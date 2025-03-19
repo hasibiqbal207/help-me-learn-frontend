@@ -38,6 +38,7 @@ export const createReview = async (req, res) => {
 export const getReviewById = async (req, res) => {
   try {
     const reviews = await reviewService.getReviewsByTutorId(req.params.tutorProfileId);
+    console.log(reviews)
     res.json(reviews);
   } catch (error) {
     res.status(400).send(`Response Error: ${error}`);

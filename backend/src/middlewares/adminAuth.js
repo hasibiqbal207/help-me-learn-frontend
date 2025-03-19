@@ -16,7 +16,7 @@ export const isAdmin = (req, res, next) => {
     try {
       const decodedToken = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
       // console.log(decodedToken);
-      if (decodedToken.user_type === 100) {
+      if (decodedToken.userType === 100) {
         next();
       } else {
         res.status(403).json({ status: false, message: "Permission denied" });

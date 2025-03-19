@@ -27,13 +27,10 @@ export const updateTutorStatus = async (tutorProfileId) => {
 };
 
 export const getQualificationById = async (id) => {
-  console.log('I am here')
-  const result = executeQuery(
+  return executeQuery(
     "SELECT * FROM hm_qualification WHERE id = ?",
     [id]
   );
-  console.log(result)
-
 };
 
 export const getQualificationsByTutorProfileId = async (tutorProfileId) => {

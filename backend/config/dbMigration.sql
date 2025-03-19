@@ -87,7 +87,7 @@ CREATE TABLE `hm_post` (
 -- Table structure for `hm_qualification`
 DROP TABLE IF EXISTS `hm_qualification`;
 CREATE TABLE `hm_qualification` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `subjectName` varchar(1000) NOT NULL,
   `description` varchar(80) NOT NULL,
   `grade` varchar(45) DEFAULT NULL,
@@ -136,6 +136,18 @@ CREATE TABLE `hm_user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Table structure for `hm_feedback`
+DROP TABLE IF EXISTS `hm_feedback`;
+CREATE TABLE `hm_feedback` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `subject` varchar(100) NOT NULL,
+  `description` varchar(250) NOT NULL,
+  `createdDateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `userId` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 SET TIME_ZONE=@OLD_TIME_ZONE;

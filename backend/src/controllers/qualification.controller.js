@@ -7,10 +7,8 @@ export const createQualification = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    
     const tutorProfile = await qualificationService.getTutorProfileByUserId(req.body.userId);
     const tutorProfileId = tutorProfile[0].id;
-    
     const qualificationData = {
       ...req.body,
       tutorProfileId
@@ -28,7 +26,7 @@ export const createQualification = async (req, res) => {
 export const getQualificationById = async (req, res) => {
   try {
     const result = await qualificationService.getQualificationById(req.params.id);
-  
+    console.log(result)
     res.status(200).json(result);
   } catch (error) {
     res.status(400).send(`Request Error: ${error}`);
@@ -37,7 +35,7 @@ export const getQualificationById = async (req, res) => {
 
 export const getQualificationByTutorProfileId = async (req, res) => {
   try {
-    const result = await qualificationService.getQualificationsByTutorProfileId(req.params.tutorProfileId);
+    const result = await qualificationService.getQualificationsByTutorProfileId(req.params.id);
     res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message });
