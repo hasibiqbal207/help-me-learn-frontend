@@ -21,6 +21,7 @@ export default function TutorProfile(props) {
     tutorId = props.tutorId;
   }
   const tutorInfoDataById = useSelector(getTutorInfoDataById);
+  console.log(tutorInfoDataById);
   const [tutorInfoData, setTutorInfoData] = useState([]);
   useEffect(() => {
     dispatch(getTutorInfoById(tutorId));
@@ -60,7 +61,7 @@ export default function TutorProfile(props) {
             <br />
             <Row>
               <span className="text-muted" style={{ float: "left" }}>
-                {`Age: ${tutorInfoData?.age ?? 'N/A'}`}
+                {`Age: ${tutorInfoData?.age ?? "N/A"}`}
               </span>
               <span className="mt-2 text-muted" style={{ float: "left" }}>
                 {tutorInfoData?.about}

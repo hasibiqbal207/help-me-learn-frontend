@@ -3,75 +3,75 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Alert, Row, Col } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-// import {
-//   registerUser,
-//   setRegistrationAlert,
-// } from "../../core/actionCreators/user";
-// import { getRegistrationAlert } from "../../core/selectors/user";
-import "./Registration.css";
+import {
+  registerUser,
+  setRegistrationAlert,
+} from "../../core/actionCreators/user";
+import { getRegistrationAlert } from "../../core/selectors/user";
+import "./registration.css";
 
 function Registration(props) {
-//   const navigate = useNavigate();
-//   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     var data = {};
-//     [...e.target.elements].forEach((element) => {
-//       let name = element.name;
-//       if (name !== undefined && name !== "") {
-//         let value = element.value;
-//         data[name] = value;
-//       }
-//     });
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    let data = {};
+    [...e.target.elements].forEach((element) => {
+      let name = element.name;
+      if (name !== undefined && name !== "") {
+        let value = element.value;
+        data[name] = value;
+      }
+    });
 
-//     let errorMessage = undefined;
-//     if (data["email"] === undefined || !data["email"].includes("hs-fulda.de"))
-//       errorMessage = "Please provide Hochschule email address.";
+    let errorMessage = undefined;
+    if (data["email"] === undefined)
+      errorMessage = "Please provide an email address.";
 
-//     if (data["gender"] === undefined || data["gender"] === "-1")
-//       errorMessage = "Gender not selected.";
+    if (data["gender"] === undefined || data["gender"] === "-1")
+      errorMessage = "Gender not selected.";
 
-//     if (data["usertype"] === undefined || data["usertype"] === "-1")
-//       errorMessage = "User type not selected.";
+    if (data["userType"] === undefined || data["userType"] === "-1")
+      errorMessage = "User type not selected.";
 
-//     if (data["password"] != data["confirmPassword"])
-//       errorMessage = "Confirm password does not match";
+    if (data["password"] != data["confirmPassword"])
+      errorMessage = "Confirm password does not match";
 
-//     if (errorMessage !== undefined) {
-//       dispatch(setRegistrationAlert(errorMessage));
-//     } else {
-//       // Always approved
-//       data["status"] = 101;
+    if (errorMessage !== undefined) {
+      dispatch(setRegistrationAlert(errorMessage));
+    } else {
+      // Always approved
+      data["status"] = 101;
 
-//       data["confirmPassword"] = undefined;
-//       dispatch(registerUser({ data, navigate }));
-//     }
-//   };
+      data["confirmPassword"] = undefined;
+      dispatch(registerUser({ data, navigate }));
+    }
+  };
 
-//   const registrationAlert = useSelector(getRegistrationAlert);
+  const registrationAlert = useSelector(getRegistrationAlert);
 
   return (
     <div className="registration-page">
       <div className="registration-content">
-        {/* <img src="logo512.png" className="registration-logo" alt="logo" /> */}
-        {/* {registrationAlert && (
+        <img src="logo512.png" className="registration-logo" alt="logo" />
+        {registrationAlert && (
           <Alert variant={registrationAlert.type}>
             {registrationAlert.message}
           </Alert>
-        )} */}
-        <Form>
+        )}
+        <Form onSubmit={handleSubmit}>
           <Form.Control
             className="mt-2"
             type="text"
-            name="first_name"
+            name="firstName"
             placeholder="First Name"
             required
           />
           <Form.Control
             className="mt-2"
             type="text"
-            name="last_name"
+            name="lastName"
             placeholder="Last Name"
             required
           />
@@ -107,7 +107,7 @@ function Registration(props) {
                 </Form.Select>
               </Col>
               <Col>
-                <Form.Select name="usertype" className="mt-2">
+                <Form.Select name="userType" className="mt-2">
                   <option value="-1">Select User Type</option>
                   <option value="101">Tutor</option>
                   <option value="102">Student</option>

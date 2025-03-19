@@ -94,6 +94,7 @@ export function* getTutorList(action) {
 
 export function* getTutorInfoDataById(action) {
   const { id } = action.payload;
+  console.log(id);
   const apiOptions = {
     url: getTutorInfoById(id),
     method: "GET",
@@ -156,7 +157,7 @@ export function* saveReview(action) {
   // const { course } = action.payload;
   console.log(action.payload);
 
-  // var url = process.env.REACT_APP_API_URL;
+  // let url = process.env.REACT_APP_API_URL;
   // url += `/reviews`;
 
   const apiOptions = {

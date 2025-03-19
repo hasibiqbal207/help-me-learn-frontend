@@ -6,7 +6,7 @@ import { getCourseSearchResult } from "../../../../core/selectors/offerCourse";
 import Pagination from "../../../../components/pagination/Pagination.jsx";
 
 export default function TutorList() {
-  const data = useSelector(getCourseSearchResult); //TODO: Change var to const
+  const data = useSelector(getCourseSearchResult); //TODO: Change let to const
 
   const [active, toggleActive] = useState(1);
   if (data === undefined) {

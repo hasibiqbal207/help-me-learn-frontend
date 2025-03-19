@@ -35,10 +35,10 @@ export default function ReviewList(props) {
 
   const submitReview = () => {
     let review = {
-      Rating: starCountRef.current.state.value,
-      Text: textReviewRef.current.value,
-      UserId: user.id,
-      TutorProfileId: Number(tutorId),
+      rating: starCountRef.current.state.value,
+      text: textReviewRef.current.value,
+      userId: user.id,
+      tutorProfileId: Number(tutorId),
     };
     dispatch(saveReview(review));
   };

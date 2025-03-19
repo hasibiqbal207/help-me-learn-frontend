@@ -34,7 +34,7 @@ export function* saveOfferCourse(action) {
     msg = "Course Saved Successfully";
     yield put(saveOfferCourseSuccess({ msg }));
   } else {
-    msg = "Failed to save data"; //FIXME Improve error message
+    msg = apiResponse.ErrorMessage || "Failed to save course offering. Please try again.";
     yield put(saveOfferCourseFailed({ msg }));
   }
 }

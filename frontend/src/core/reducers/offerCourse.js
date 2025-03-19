@@ -15,6 +15,7 @@ export const INITIAL_STATE = {
     minRate: 0,
     gender: undefined,
   },
+  saveAlert: undefined,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -34,13 +35,29 @@ export default (state = INITIAL_STATE, action) => {
     case SAVE_OFFER_COURSE:
       return {
         ...state,
+        saveAlert: undefined,
       };
     case SAVE_OFFER_COURSE_LOADING:
-      return INITIAL_STATE;
+      return {
+        ...state,
+        saveAlert: undefined,
+      };
     case SAVE_OFFER_COURSE_SUCCESS:
-      return INITIAL_STATE;
+      return {
+        ...state,
+        saveAlert: {
+          type: "success",
+          message: action.data.msg || "Course offering submitted for approval!",
+        },
+      };
     case SAVE_OFFER_COURSE_FAILED:
-      return INITIAL_STATE;
+      return {
+        ...state,
+        saveAlert: {
+          type: "danger",
+          message: action.data?.msg || "Failed to submit course offering. Please try again.",
+        },
+      };
     default:
       return state;
   }

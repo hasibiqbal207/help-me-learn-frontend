@@ -52,15 +52,8 @@ function renderUserOptions(currentUser, isAuth, onSignOut) {
 
 function renderBrand() {
   return (
-    <Navbar.Brand href="/#/home">
-      <img
-        alt=""
-        src="logo512.png"
-        width="32"
-        height="32"
-        className="d-inline-block align-top"
-      />{" "}
-      HelpMeLearn
+    <Navbar.Brand href="/home">
+      Help Me Learn
     </Navbar.Brand>
   );
 }
@@ -77,9 +70,6 @@ function Header(props) {
 
   return (
     <div>
-      <p style={{ textAlign: "center", marginTop: "1rem" }}>
-        Banner Text
-      </p>
       <Navbar bg="primary" variant="dark">
         <Container fluid="lg">
           {renderBrand()}

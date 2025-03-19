@@ -1,16 +1,31 @@
-import React from 'react'
+import React from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import "./login.css";
 
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../../core/actionCreators/user";
+import { getLoginAlert } from "../../core/selectors/user";
+
 const Login = () => {
+  const dispatch = useDispatch();
+
+  const loginAlert = useSelector(getLoginAlert);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    let elements = e.target.elements;
+
+    dispatch(loginUser(elements.email.value, elements.password.value));
+  };
+
   return (
     <div className="login-page">
       <div className="login-content">
-        {/* {loginAlert && (
+        {loginAlert && (
           <Alert variant={loginAlert.type}>{loginAlert.message}</Alert>
-        )} */}
-        <Form>
+        )}
+        <Form onSubmit={handleSubmit}>
           <Form.Control
             className="mt-3"
             type="email"
@@ -38,6 +53,6 @@ const Login = () => {
       </div>
     </div>
   );
-}
+};
 
-export default Login
+export default Login;

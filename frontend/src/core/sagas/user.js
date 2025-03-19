@@ -15,14 +15,14 @@ export default function* loginSaga() {
 }
 
 export function* login(action) {
-  const { email, pd } = action.payload;
+  const { email, password } = action.payload;
 
   const apiOptions = {
     url: loginApi,
     method: "POST",
-    params: {
+    body: {
       email: email,
-      password: pd,
+      password: password,
     },
     useJwtSecret: false,
   };
@@ -38,8 +38,9 @@ export function* login(action) {
     const { id, email, token } = response;
     if (token !== undefined) {
       let decoded = jwt_decode(token);
-      const { id, email, user_type, status, exp } = decoded;
-      yield put(setCurrentUser({ id, email, user_type, status, exp, token }));
+      console.log(decoded);
+      const { id, email, userType, status, exp } = decoded;
+      yield put(setCurrentUser({ id, email, userType, status, exp, token }));
     }
   } else {
     const errorMessage = response.message || response.ErrorMessage;
@@ -47,11 +48,22 @@ export function* login(action) {
   }
 }
 
-export function* register(action){
+export function* register(action) {
+  const { firstName, lastName, userType, email, password, gender, status } =
+    action.payload.data;
+
   const apiOptions = {
     url: registerApi,
     method: "POST",
-    params: action.payload.data,
+    body: {
+      firstName: firstName,
+      lastName: lastName,
+      userType: userType,
+      email: email,
+      password: password,
+      gender: gender,
+      status: status,
+    },
     useJwtSecret: false,
   };
 
@@ -68,3 +80,4 @@ export function* register(action){
     yield put(setRegistrationAlert(errorMessage));
   }
 }
+

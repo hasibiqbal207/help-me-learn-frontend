@@ -17,6 +17,7 @@ function Home() {
 
   let userType = useSelector(getUserType);
   let currentUser = useSelector(getCurrentUser);
+  console.log(userType);
 
   function renderHome() {
     switch (userType) {

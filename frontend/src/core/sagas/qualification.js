@@ -26,7 +26,7 @@ export function* fetchQualificationById(action) {
   console.log(action.payload);
   // qualificationApi+=`/id=${id}`;
 
-  var url = qualificationApi + `/id:${id}`;
+  let url = qualificationApi + `/id:${id}`;
 
   const apiOptions = {
     url: url,
@@ -42,14 +42,12 @@ export function* fetchQualificationById(action) {
 }
 
 export function* saveQualification(action) {
-  console.log("saga" + action.payload);
   const apiOptions = {
     url: qualificationApi,
     method: "POST",
     params: action.payload,
-    useJwtSecret: true,
+    useJwtSecret: false,
   };
-  console.log("saga" + apiOptions.url);
   const apiResponse = yield call(executeApiCall, apiOptions);
 
   const { isSuccessful } = apiResponse;

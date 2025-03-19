@@ -48,7 +48,7 @@ export const logoutUser = () => ({
 export const setCurrentUser = ({
   id,
   email,
-  user_type,
+  userType,
   status,
   exp,
   token,
@@ -57,7 +57,7 @@ export const setCurrentUser = ({
   payload: {
     id,
     email,
-    user_type,
+    userType,
     status,
     exp,
     token,

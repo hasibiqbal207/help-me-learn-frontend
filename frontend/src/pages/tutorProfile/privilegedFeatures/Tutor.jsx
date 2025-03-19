@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Offcanvas, Row, Col, Button, Form } from "react-bootstrap";
+import { Offcanvas, Row, Col, Button, Form, Alert } from "react-bootstrap";
 import { Fab, Action } from "react-tiny-fab";
 import Avatar from "react-avatar-edit";
 import Chat from "../../../components/chat/Chat.jsx";
@@ -10,6 +10,7 @@ import { saveOfferCourse } from "../../../core/actionCreators/offerCourse";
 import { saveQualification } from "../../../core/actionCreators/qualification";
 import { uploadProfilePicture } from "../../../core/actionCreators/profilePicture";
 import { getCurrentUser } from "../../../core/selectors/user";
+import { getOfferCourseSaveAlert } from "../../../core/selectors/offerCourse";
 
 export default function Tutor() {
   const navigate = useNavigate();
@@ -71,7 +72,7 @@ export default function Tutor() {
   };
 
   const dataURLtoFile = (dataurl, filename) => {
-    var arr = dataurl.split(","),
+    let arr = dataurl.split(","),
       mime = arr[0].match(/:(.*?);/)[1],
       bstr = atob(arr[1]),
       n = bstr.length,
@@ -194,13 +195,13 @@ export default function Tutor() {
     //...
     e.preventDefault();
 
-    var elements = e.target.elements;
+    let elements = e.target.elements;
 
     const qualification = {
-      SubjectName: elements.subject.value,
-      Grade: elements.grade.value,
-      Description: elements.description.value,
-      UserId: currentUser.id,
+      subjectName: elements.subject.value,
+      grade: elements.grade.value,
+      description: elements.description.value,
+      userId: currentUser.id,
     };
 
     dispatch(saveQualification(qualification));
@@ -257,27 +258,32 @@ export default function Tutor() {
   }
 
   const onOfferingSubmitted = (e) => {
-    //...
     e.preventDefault();
 
-    var elements = e.target.elements;
+    let elements = e.target.elements;
 
     const offerCourse = {
-      SubjectName: elements.subject.value,
-      Language: elements.language.value,
-      Level: elements.level.value,
-      Description: elements.description.value,
-      RatePerHour: elements.fee.value,
-      ExperinceYears: elements.experience.value,
-      AvailableTime: elements.time.value,
-      UserId: currentUser.id,
-      Status: 101, //Approved
+      subjectName: elements.subject.value,
+      language: elements.language.value,
+      level: elements.level.value,
+      description: elements.description.value,
+      ratePerHour: elements.fee.value,
+      experinceYears: elements.experience.value,
+      availableTime: elements.time.value,
+      userId: currentUser.id,
+      status: 100, // Changed to 100 (Pending) instead of 101 (Approved)
     };
 
     dispatch(saveOfferCourse(offerCourse));
+    
+    // Close the offering editor after submission
+    toggleOfferingEditor(false);
   };
 
   function renderOfferingEditor() {
+    // Get the save alert from Redux state
+    const offerCourseSaveAlert = useSelector(getOfferCourseSaveAlert);
+    
     return (
       <Offcanvas
         style={{ width: "35%", zIndex: 9999 /** to overlay fab button */ }}
@@ -290,6 +296,11 @@ export default function Tutor() {
         </Offcanvas.Header>
         <Offcanvas.Body>
           <div>
+            {offerCourseSaveAlert && (
+              <Alert variant={offerCourseSaveAlert.type}>
+                {offerCourseSaveAlert.message}
+              </Alert>
+            )}
             <Form onSubmit={onOfferingSubmitted}>
               <Form.Control
                 type="text"

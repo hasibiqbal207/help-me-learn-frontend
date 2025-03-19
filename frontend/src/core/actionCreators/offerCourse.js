@@ -43,7 +43,8 @@ import {
     data,
   });
   
-  export const saveOfferCourseFailed = () => ({
+  export const saveOfferCourseFailed = (data) => ({
     type: SAVE_OFFER_COURSE_FAILED,
+    data,
   });
   
