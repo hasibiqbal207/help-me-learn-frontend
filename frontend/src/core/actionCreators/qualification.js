@@ -8,6 +8,9 @@ import {
   UPDATE_QUALIFICATION,
   UPDATE_QUALIFICATION_SUCCESS,
   UPDATE_QUALIFICATION_FAILED,
+  DELETE_QUALIFICATION,
+  DELETE_QUALIFICATION_SUCCESS,
+  DELETE_QUALIFICATION_FAILED,
 } from "../actionTypes/qualification";
 
 //GET
@@ -81,6 +84,36 @@ export const updateQualificationFailed = (message, type = "danger") => ({
   type: UPDATE_QUALIFICATION_FAILED,
   payload: {
     updateAlert: {
+      message,
+      type,
+    },
+  },
+});
+
+//DELETE
+export const deleteQualification = (id) => {
+  return {
+    type: DELETE_QUALIFICATION,
+    payload: {
+      id,
+    },
+  };
+};
+
+export const deleteQualificationSuccess = (message, type = "success") => ({
+  type: DELETE_QUALIFICATION_SUCCESS,
+  payload: {
+    deleteAlert: {
+      message,
+      type,
+    },
+  },
+});
+
+export const deleteQualificationFailed = (message, type = "danger") => ({
+  type: DELETE_QUALIFICATION_FAILED,
+  payload: {
+    deleteAlert: {
       message,
       type,
     },

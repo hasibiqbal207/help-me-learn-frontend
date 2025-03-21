@@ -5,6 +5,7 @@ import {
   SAVE_QUALIFICATION,
   UPDATE_QUALIFICATION,
   FETCH_QUALIFICATION_BY_ID,
+  DELETE_QUALIFICATION,
 } from "../actionTypes/qualification";
 import {
   setQualification,
@@ -12,12 +13,15 @@ import {
   saveQualificationFailed,
   updateQualificationSuccess,
   updateQualificationFailed,
+  deleteQualificationSuccess,
+  deleteQualificationFailed,
 } from "../actionCreators/qualification";
 
 export default function* qualificationSaga() {
   yield takeEvery(FETCH_QUALIFICATION_BY_ID, fetchQualificationById);
   yield takeEvery(SAVE_QUALIFICATION, saveQualification);
   yield takeEvery(UPDATE_QUALIFICATION, updateQualification);
+  yield takeEvery(DELETE_QUALIFICATION, deleteQualification);
 }
 
 export function* fetchQualificationById(action) {
@@ -79,5 +83,27 @@ export function* updateQualification(action) {
   } else {
     msg = "Failed to update data"; //FIXME Improve error message
     yield put(updateQualificationFailed(msg));
+  }
+}
+
+export function* deleteQualification(action) {
+  const { id } = action.payload;
+  
+  const apiOptions = {
+    url: `${qualificationApi}/${id}`,
+    method: "DELETE",
+    useJwtSecret: false,
+  };
+
+  const apiResponse = yield call(executeApiCall, apiOptions);
+
+  const { isSuccessful } = apiResponse;
+  let msg = "";
+  if (isSuccessful) {
+    msg = "Qualification Deleted Successfully";
+    yield put(deleteQualificationSuccess(msg));
+  } else {
+    msg = "Failed to delete qualification"; //FIXME Improve error message
+    yield put(deleteQualificationFailed(msg));
   }
 }
