@@ -1,21 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Row, Col, Card } from "react-bootstrap";
+import { Row, Col, Card, Table, Button } from "react-bootstrap";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchDashboardData } from "../../../core/actionCreators/dashboard";
 import { getDashboardData } from "../../../core/selectors/dashboard";
+import { fetchTutorsProfileList } from "../../../core/actionCreators/manageTutorsProfile";
+import { getTutorsProfileList } from "../../../core/selectors/manageTutorsProfile";
+import { fetchCourseListByStatus } from "../../../core/actionCreators/course";
 
 export default function Admin() {
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
+  const [pendingTutors, setPendingTutors] = useState([]);
+  const [pendingCourses, setPendingCourses] = useState([]);
 
   useEffect(() => {
     dispatch(fetchDashboardData());
+    
+    // Fetch pending tutors (status 100)
+    dispatch(fetchTutorsProfileList({ filters: { status: "100" } }));
+    
+    // Fetch pending courses (status 100)
+    dispatch(fetchCourseListByStatus("100"));
   }, []);
 
-  let data = useSelector(getDashboardData);
+  // Get data from the redux store
+  const data = useSelector(getDashboardData);
+  const tutorsData = useSelector(getTutorsProfileList);
+  const coursesData = useSelector(state => state.course?.data || []);
+
+  useEffect(() => {
+    if (tutorsData) {
+      setPendingTutors(tutorsData);
+    }
+  }, [tutorsData]);
+
+  useEffect(() => {
+    if (coursesData) {
+      setPendingCourses(coursesData);
+    }
+  }, [coursesData]);
 
   let usersByStatus = [
     { name: "Approved", value: 0, color: "#0088FE" },
@@ -144,16 +169,177 @@ export default function Admin() {
     );
   };
 
+  // Handle view, approve, reject actions for tutors
+  const handleTutorAction = (action, userId) => {
+    // Implement the action handling logic here
+    console.log(`Tutor action: ${action} for user ${userId}`);
+    
+    // Navigate to tutor profile if view action
+    if (action === 'view') {
+      navigate(`/tutor/${userId}`);
+    }
+    // For approve/reject, you would typically dispatch an action
+    // to update the tutor status
+  };
+
+  // Handle view, approve, reject actions for courses
+  const handleCourseAction = (action, courseId) => {
+    // Implement the action handling logic here
+    console.log(`Course action: ${action} for course ${courseId}`);
+    
+    // For approve/reject, you would typically dispatch an action
+    // to update the course status
+  };
+
+  // Function to add a new subject
+  const handleAddNewSubject = () => {
+    // Implement the logic to add a new subject
+    console.log("Add new subject clicked");
+    // This might open a modal or navigate to a form page
+  };
+
   return (
     <div>
+      <h2 className="mb-4">Welcome, Admin.</h2>
+      
+      {/* Pending Tutor Requests Section */}
+      <Card className="mb-4">
+        <Card.Body>
+          <Card.Title>Pending Tutor Requests</Card.Title>
+          <Table responsive>
+            <thead>
+              <tr>
+                <th>Tutor Name</th>
+                <th>Subject Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pendingTutors.map((tutor) => (
+                <tr key={tutor.id}>
+                  <td>{tutor.firstName} {tutor.lastName}</td>
+                  <td>{tutor.subject || 'Mathematics'}</td>
+                  <td>
+                    <Button 
+                      variant="outline-primary" 
+                      size="sm" 
+                      className="me-2"
+                      onClick={() => handleTutorAction('view', tutor.userId)}
+                    >
+                      View
+                    </Button>
+                    <Button 
+                      variant="outline-success" 
+                      size="sm" 
+                      className="me-2"
+                      onClick={() => handleTutorAction('approve', tutor.userId)}
+                    >
+                      Approve
+                    </Button>
+                    <Button 
+                      variant="outline-danger" 
+                      size="sm"
+                      onClick={() => handleTutorAction('reject', tutor.userId)}
+                    >
+                      Reject
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Card.Body>
+      </Card>
+      
+      {/* Pending Course Requests Section */}
+      <Card className="mb-4">
+        <Card.Body>
+          <Card.Title>
+            Pending Course Requests
+            <Button 
+              variant="primary" 
+              size="sm" 
+              className="float-end"
+              onClick={handleAddNewSubject}
+            >
+              Add New Subject
+            </Button>
+          </Card.Title>
+          <Table responsive>
+            <thead>
+              <tr>
+                <th>Department</th>
+                <th>Subject</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pendingCourses.length > 0 ? pendingCourses.map((course) => (
+                <tr key={course.id}>
+                  <td>{course.department || 'Applied Computer Science'}</td>
+                  <td>{course.subjectName || 'Programming 1'}</td>
+                  <td>
+                    <Button 
+                      variant="outline-primary" 
+                      size="sm" 
+                      className="me-2"
+                      onClick={() => handleCourseAction('view', course.id)}
+                    >
+                      View
+                    </Button>
+                    <Button 
+                      variant="outline-success" 
+                      size="sm" 
+                      className="me-2"
+                      onClick={() => handleCourseAction('approve', course.id)}
+                    >
+                      Approve
+                    </Button>
+                    <Button 
+                      variant="outline-danger" 
+                      size="sm"
+                      onClick={() => handleCourseAction('reject', course.id)}
+                    >
+                      Reject
+                    </Button>
+                  </td>
+                </tr>
+              )) : (
+                <tr>
+                  <td>Applied Computer Science</td>
+                  <td>Programming 1</td>
+                  <td>
+                    <Button variant="outline-primary" size="sm" className="me-2">View</Button>
+                    <Button variant="outline-success" size="sm" className="me-2">Approve</Button>
+                    <Button variant="outline-danger" size="sm">Reject</Button>
+                  </td>
+                </tr>
+              )}
+              {pendingCourses.length > 0 ? null : (
+                <tr>
+                  <td>Sociology</td>
+                  <td>Sociology 2</td>
+                  <td>
+                    <Button variant="outline-primary" size="sm" className="me-2">View</Button>
+                    <Button variant="outline-success" size="sm" className="me-2">Approve</Button>
+                    <Button variant="outline-danger" size="sm">Reject</Button>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+        </Card.Body>
+      </Card>
+      
+      {/* Charts Section */}
       <Row>
-        <Col className="d-flex justify-content-start">
+        <Col md={4} className="d-flex justify-content-start">
           {renderPieChart("Users by Status", usersByStatus, onUsersByStatus)}
         </Col>
-        <Col className="d-flex justify-content-center">
+        <Col md={4} className="d-flex justify-content-center">
           {renderPieChart("Users by Type", usersByType, onUsersByType)}
         </Col>
-        <Col className="d-flex justify-content-end">
+        <Col md={4} className="d-flex justify-content-end">
           {renderPieChart("Posts by Status", postsByStatus, onPostsByStatus)}
         </Col>
       </Row>

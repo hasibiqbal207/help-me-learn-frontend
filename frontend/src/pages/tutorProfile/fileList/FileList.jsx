@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useFilePicker } from "use-file-picker";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { ListGroup, Badge, Button, Row, Col } from "react-bootstrap";
+import { ListGroup, Badge, Button, Row, Col, Alert } from "react-bootstrap";
 import { getUserType } from "../../../core/selectors/user";
 import { getTutorFiles } from "../../../core/selectors/tutor";
 import { fetchTutorFiles } from "../../../core/actionCreators/tutor";
@@ -39,14 +39,6 @@ export default function FileList(props) {
   const submitFile = (e) => {
     dispatch(uploadFile(e));
   };
-
-  if (
-    tutorFiles === undefined ||
-    tutorFiles.length === undefined ||
-    tutorFiles.length === 0
-  ) {
-    return null;
-  }
 
   const renderUploadFiles = () => {
     if (userType === "tutor") {
@@ -89,6 +81,24 @@ export default function FileList(props) {
       );
     }
   };
+
+  if (
+    tutorFiles === undefined ||
+    tutorFiles.length === undefined ||
+    tutorFiles.length === 0
+  ) {
+    return (
+      <div>
+        {renderUploadFiles()}
+        <div>
+          <span>MY FILES</span>
+          <Alert variant="info" className="mt-3">
+            No files available. This tutor has not uploaded any files yet.
+          </Alert>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

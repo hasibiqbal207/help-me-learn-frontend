@@ -34,7 +34,7 @@ const AppRoutes = () => {
         <Route path="/tutor/:tutorId" element={<TutorProfile />} />
       </Routes>
     </Router>
-  );
+  );           
 };
 
 export default AppRoutes;

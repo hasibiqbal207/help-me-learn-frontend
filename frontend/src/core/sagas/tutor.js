@@ -94,15 +94,17 @@ export function* getTutorList(action) {
 
 export function* getTutorInfoDataById(action) {
   const { id } = action.payload;
-  console.log(id);
+  console.log("Fetching tutor info for ID:", id);
   const apiOptions = {
     url: getTutorInfoById(id),
     method: "GET",
     useJwtSecret: false,
   };
+  console.log("API URL:", getTutorInfoById(id));
 
   const apiResponse = yield call(executeApiCall, apiOptions);
   const { isSuccessful, response = {} } = apiResponse;
+  console.log("API Response:", isSuccessful, response);
   if (isSuccessful) {
     yield put(setTutorInfo(response));
   }

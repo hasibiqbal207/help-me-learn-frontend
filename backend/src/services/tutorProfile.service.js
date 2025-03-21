@@ -82,36 +82,58 @@ export const searchTutorProfiles = async (searchParams) => {
 };
 
 export const updateTutorProfile = async (profileData) => {
-  const { userId, about, age, picturePath } = profileData;
-  const updates = [];
-  const values = [];
-
-  if (picturePath) {
-    await executeQuery(
-      "UPDATE hm_tutor_profile SET picPath = ?, status = 100 WHERE userId = ?",
-      [picturePath, userId]
-    );
+  try {
+    const { userId, picturePath, about, age } = profileData;
+    
+    // Validate about text length
+    if (about && about.length > 250) {
+      console.log("About text exceeds maximum length of 250 characters");
+      return { 
+        success: false, 
+        message: "About text exceeds maximum length of 250 characters"
+      };
+    }
+    
+    if (picturePath) {
+      console.log("Updating profile picture:", picturePath);
+      await executeQuery(
+        "UPDATE hm_tutor_profile SET picPath = ? WHERE userId = ?",
+        [picturePath, userId]
+      );
+    }
+    
+    // Build the updates for about and age fields
+    const updates = [];
+    const values = [];
+    
+    if (about !== undefined) {
+      updates.push("about = ?");
+      values.push(about);
+      console.log("Will update about field to:", about);
+    }
+    
+    if (age !== undefined) {
+      updates.push("age = ?");
+      values.push(age);
+      console.log("Will update age field to:", age);
+    }
+    
+    // Only proceed with additional updates if there are fields to update
+    if (updates.length > 0) {
+      values.push(userId);
+      
+      const query = `UPDATE hm_tutor_profile SET ${updates.join(", ")} WHERE userId = ?`;
+      console.log("Final update query:", query);
+      console.log("Values for query:", values);
+      
+      return executeQuery(query, values);
+    }
+    
+    return { message: "No fields to update" };
+  } catch (error) {
+    console.error("Error in updateTutorProfile:", error);
+    throw error;
   }
-
-  if (about) {
-    updates.push("about = ?");
-    values.push(about);
-  }
-
-  if (age) {
-    updates.push("age = ?");
-    values.push(age);
-  }
-
-  if (updates.length > 0) {
-    updates.push("status = 100");
-    values.push(userId);
-
-    const query = `UPDATE hm_tutor_profile SET rating = 0, ${updates.join(", ")} WHERE userId = ?`;
-    return executeQuery(query, values);
-  }
-
-  return null;
 };
 
 export const updateTutorStatus = async (userId, status) => {

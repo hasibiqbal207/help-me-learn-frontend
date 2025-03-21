@@ -6,7 +6,7 @@ import { getTutorReviewDataById } from "../../../core/selectors/tutor";
 import { getTutorReviewById } from "../../../core/actionCreators/tutor";
 import { setTutorReview } from "../../../core/actionCreators/tutor";
 import { saveReview } from "../../../core/actionCreators/tutor";
-import { ListGroup, Row, Col, Button, Form } from "react-bootstrap";
+import { ListGroup, Row, Col, Button, Form, Alert } from "react-bootstrap";
 import Rate from "rc-rate";
 import "rc-rate/assets/index.css";
 import { getCurrentUser, getUserType } from "../../../core/selectors/user";
@@ -82,7 +82,14 @@ export default function ReviewList(props) {
       tutorReviews.length === undefined ||
       tutorReviews.length === 0
     ) {
-      return null;
+      return (
+        <div>
+          <span>REVIEWS</span>
+          <Alert variant="info" className="mt-3">
+            No reviews available. Be the first to leave a review for this tutor!
+          </Alert>
+        </div>
+      );
     }
 
     return (

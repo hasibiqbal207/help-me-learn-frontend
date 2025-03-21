@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
+import { faker } from '@faker-js/faker';
 import CourseList from "./courseList/CourseList";
 import ReviewList from "./reviewList/ReviewList";
 import QualificationList from "./qualificationList/QualificationList";
@@ -21,25 +22,57 @@ export default function TutorProfile(props) {
     tutorId = props.tutorId;
   }
   const tutorInfoDataById = useSelector(getTutorInfoDataById);
-  console.log(tutorInfoDataById);
+  console.log("tutorInfoDataById from selector:", tutorInfoDataById);
   const [tutorInfoData, setTutorInfoData] = useState([]);
+  const [fakerAvatar, setFakerAvatar] = useState('');
+  
   useEffect(() => {
     dispatch(getTutorInfoById(tutorId));
-  }, []);
+    // Generate a consistent avatar based on tutorId
+    // Set seed based on tutorId to ensure the same tutor always gets the same avatar
+    try {
+      faker.seed(parseInt(tutorId, 10) || 0);
+      const avatar = faker.image.avatar();
+      console.log('Generated Faker avatar:', avatar);
+      setFakerAvatar(avatar);
+    } catch (error) {
+      console.error('Error generating Faker avatar:', error);
+      // Set a fallback avatar URL
+      setFakerAvatar('https://via.placeholder.com/148x148?text=Tutor');
+    }
+  }, [tutorId]);
+  
   useEffect(() => {
-    setTutorInfoData(tutorInfoDataById[0]);
+    console.log("tutorInfoDataById changed:", tutorInfoDataById);
+    if (tutorInfoDataById && tutorInfoDataById.length > 0) {
+      setTutorInfoData(tutorInfoDataById[0]);
+    } else {
+      // Handle case when no data is available
+      console.log("No tutor data available");
+    }
   }, [tutorInfoDataById]);
 
-  // TODO: Remove
-  const photo = "/no-image.png";
+  // Add a separate effect to log tutorInfoData after it's been updated
+  useEffect(() => {
+    console.log("tutorInfoData updated:", tutorInfoData);
+  }, [tutorInfoData]);
 
   const userType = useSelector(getUserType);
 
   const getPicPath = () => {
+    // Log the values for debugging
+    console.log('filesApi:', filesApi);
+    console.log('tutorInfoData:', tutorInfoData);
+    console.log('fakerAvatar:', fakerAvatar);
+    
     if (tutorInfoData && tutorInfoData.picPath) {
-      return `${filesApi}/${tutorInfoData.picPath}`;
+      const imagePath = `${filesApi}/${tutorInfoData.picPath}`;
+      console.log('Using real profile pic:', imagePath);
+      return imagePath;
     }
-    return photo;
+    
+    console.log('Using faker avatar:', fakerAvatar);
+    return fakerAvatar; // Use faker avatar instead of no-image.png
   };
 
   function renderProfile() {
@@ -47,7 +80,10 @@ export default function TutorProfile(props) {
       <Container className="border border-1 rounded">
         <Row style={{ padding: 5 }}>
           <Col xs={2}>
-            <img src={getPicPath()} style={{ width: "148px" }} />
+            <img 
+              src={getPicPath()} 
+              style={{ width: "148px" }}              
+            />
           </Col>
           <Col>
             <Row>

@@ -52,6 +52,9 @@ export const setCurrentUser = ({
   status,
   exp,
   token,
+  about,
+  age,
+  picPath
 }) => ({
   type: SET_CURRENT_USER,
   payload: {
@@ -61,5 +64,8 @@ export const setCurrentUser = ({
     status,
     exp,
     token,
+    about,
+    age,
+    picPath
   },
 });

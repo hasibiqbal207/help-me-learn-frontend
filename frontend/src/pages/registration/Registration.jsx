@@ -43,8 +43,12 @@ function Registration(props) {
     } else {
       // Always approved
       data["status"] = 101;
+      
+      // Make sure userType is sent as a number
+      data["userType"] = parseInt(data["userType"]);
 
       data["confirmPassword"] = undefined;
+      console.log("Submitting registration data:", data);
       dispatch(registerUser({ data, navigate }));
     }
   };

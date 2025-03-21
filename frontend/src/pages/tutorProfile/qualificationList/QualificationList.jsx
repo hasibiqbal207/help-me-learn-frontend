@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { ListGroup, Button, Row, Col, Badge } from "react-bootstrap";
+import { ListGroup, Button, Row, Col, Badge, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { getUserType } from "../../../core/selectors/user";
 import { getTutorQualificationDataById } from "../../../core/selectors/tutor";
@@ -28,7 +28,14 @@ export default function QualificationList(props) {
     tutorQualifications.length === undefined ||
     tutorQualifications.length === 0
   ) {
-    return null;
+    return (
+      <div>
+        <span>MY QUALIFICATION</span>
+        <Alert variant="info" className="mt-3">
+          No qualifications available. This tutor has not added any qualifications yet.
+        </Alert>
+      </div>
+    );
   }
 
   return (

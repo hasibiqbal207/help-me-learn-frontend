@@ -1,6 +1,6 @@
 export const getUserType = (state) => {
   if (state.user.current === undefined) return "guest";
-  switch (state.user.current.status) {
+  switch (state.user.current.userType) {
     case 100: // Admin
       return "admin";
     case 101: // Tutor

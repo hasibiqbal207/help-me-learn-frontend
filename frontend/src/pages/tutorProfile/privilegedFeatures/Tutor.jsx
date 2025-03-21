@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Offcanvas, Row, Col, Button, Form, Alert } from "react-bootstrap";
@@ -11,6 +11,9 @@ import { saveQualification } from "../../../core/actionCreators/qualification";
 import { uploadProfilePicture } from "../../../core/actionCreators/profilePicture";
 import { getCurrentUser } from "../../../core/selectors/user";
 import { getOfferCourseSaveAlert } from "../../../core/selectors/offerCourse";
+import { getTutorInfoById } from "../../../core/actionCreators/tutor";
+import { getTutorInfoDataById } from "../../../core/selectors/tutor";
+import { faker } from '@faker-js/faker';
 
 export default function Tutor() {
   const navigate = useNavigate();
@@ -22,8 +25,29 @@ export default function Tutor() {
 
   const [pictureFile, setPictureFile] = useState(undefined);
   const [picturePreview, setPicturePreview] = useState(null);
+  const [profileAlert, setProfileAlert] = useState(null);
+  
+  // Form state for age and about
+  const [age, setAge] = useState("");
+  const [about, setAbout] = useState("");
 
   const currentUser = useSelector(getCurrentUser);
+  const tutorInfoDataById = useSelector(getTutorInfoDataById);
+  const [tutorInfoData, setTutorInfoData] = useState(null);
+
+  // Get tutor info when component mounts
+  useEffect(() => {
+    if (currentUser && currentUser.id) {
+      dispatch(getTutorInfoById(currentUser.id));
+    }
+  }, []);
+
+  // Update local state when tutor info changes
+  useEffect(() => {
+    if (tutorInfoDataById && tutorInfoDataById.length > 0) {
+      setTutorInfoData(tutorInfoDataById[0]);
+    }
+  }, [tutorInfoDataById]);
 
   const qualificationEditorClosed = () => {
     toggleQualificationEditor(false);
@@ -44,12 +68,17 @@ export default function Tutor() {
   const editorClosed = () => {
     toggleEditor(false);
     setPicturePreview(null);
+    setProfileAlert(null);
   };
 
-  const editorOpened = () => toggleEditor(true);
-
-  const ageRef = useRef(null);
-  const aboutRef = useRef(null);
+  const editorOpened = () => {
+    // When opening editor, set form values to current values
+    if (tutorInfoData) {
+      setAge(tutorInfoData.age || "");
+      setAbout(tutorInfoData.about || "");
+    }
+    toggleEditor(true);
+  };
 
   const chatClosed = () => toggleChat(false);
   const chatOpened = () => toggleChat(true);
@@ -85,19 +114,85 @@ export default function Tutor() {
     return new File([u8arr], filename, { type: mime });
   };
 
+  // Helper function to get a Faker avatar as a data URL
+  const getFakerAvatar = async () => {
+    const avatarUrl = faker.image.avatar();
+    try {
+      const response = await fetch(avatarUrl);
+      const blob = await response.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error("Error fetching faker avatar:", error);
+      return null;
+    }
+  };
+
   const dispatch = useDispatch();
-  const onProfileEdit = () => {
-    if (pictureFile || aboutRef.current.value || ageRef.current.value) {
+  const onProfileEdit = async () => {
+    // Get values from state rather than refs
+    const ageValue = age;
+    const aboutValue = about;
+    
+    // Validate about field length
+    if (aboutValue && aboutValue.length > 250) {
+      setProfileAlert({ 
+        type: "danger", 
+        message: "About text exceeds the maximum limit of 250 characters." 
+      });
+      return;
+    }
+    
+    let profilePic = null;
+    
+    // If user didn't select a picture and there's no existing picture, use faker
+    if (!pictureFile && (!tutorInfoData || !tutorInfoData.picPath)) {
+      const fakerDataUrl = await getFakerAvatar();
+      if (fakerDataUrl) {
+        profilePic = dataURLtoFile(fakerDataUrl, "profile.jpg");
+      }
+    } else if (pictureFile) {
+      // User selected a new picture
+      profilePic = dataURLtoFile(picturePreview, pictureFile.name);
+    }
+
+    if (profilePic || aboutValue || ageValue) {
+      console.log("Sending profile update with:", {
+        hasFile: !!profilePic,
+        userId: currentUser.id,
+        about: aboutValue,
+        age: ageValue
+      });
+      
       dispatch(
         uploadProfilePicture({
-          profilePicture: pictureFile
-            ? dataURLtoFile(picturePreview, pictureFile.name)
-            : null,
+          profilePicture: profilePic,
           UserId: currentUser.id,
-          About: aboutRef.current.value,
-          Age: ageRef.current.value,
+          About: aboutValue || "",
+          Age: ageValue || "",
+          currentUser: currentUser,
+          onSuccess: () => {
+            setProfileAlert({ type: "success", message: "Profile updated successfully" });
+            // Don't clear the form values after success so user can see the values
+            setPicturePreview(null);
+            setPictureFile(undefined);
+            
+            dispatch(getTutorInfoById(currentUser.id));
+          },
+          onFailure: (errorMessage) => {
+            setProfileAlert({ 
+              type: "danger", 
+              message: errorMessage || "Failed to update profile" 
+            });
+          }
         })
       );
+    } else {
+      // Show warning if no fields to update
+      setProfileAlert({ type: "warning", message: "Please provide at least one field to update" });
     }
   };
 
@@ -149,6 +244,11 @@ export default function Tutor() {
         </Offcanvas.Header>
         <Offcanvas.Body>
           <div>
+            {profileAlert && (
+              <Alert variant={profileAlert.type}>
+                {profileAlert.message}
+              </Alert>
+            )}
             <Row>
               <Col>
                 <Avatar
@@ -166,14 +266,26 @@ export default function Tutor() {
               </Col>
             </Row>
             <br />
-            <Form.Control ref={ageRef} placeholder="Age" type="number" />
+            <Form.Control 
+              type="number" 
+              placeholder="Age" 
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+            />
             <br />
             <Form.Control
-              ref={aboutRef}
-              placeholder="About"
               as="textarea"
-              rows={3}
+              rows={5}
+              placeholder="About"
+              value={about}
+              onChange={(e) => setAbout(e.target.value)}
+              maxLength={250}
+              isInvalid={about && about.length >= 250}
             />
+            <Form.Text className={about && about.length >= 240 ? "text-danger" : "text-muted"}>
+              Character count: {about ? about.length : 0}/250
+              {about && about.length >= 240 && " (approaching limit)"}
+            </Form.Text>
             <br />
             <div>
               <Button

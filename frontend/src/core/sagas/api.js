@@ -115,6 +115,19 @@ function handleAuthError(apiOptions) {
 }
 
 function configureAxiosRequest({ url, method, timeout, headers, params, body, cancelToken }) {
+  // Handle FormData objects specially for multipart uploads
+  if (params instanceof FormData) {
+    return {
+      url,
+      method,
+      timeout,
+      headers,
+      cancelToken,
+      data: params // Use params directly as data when it's FormData
+    };
+  }
+  
+  // Handle regular requests
   return {
     url,
     method,
@@ -156,9 +169,7 @@ function handleApiError(apiOptions, error) {
       responseHeaders: headers,
       errorCode: status === 401 ? "AUTHENTICATION_ERROR" : "HTTP_ERROR_CODE",
       apiOptions,
-      response: {
-        ErrorMessage: data?.ErrorMessage || "An unexpected error occurred.",
-      },
+      errorMessage: data?.ErrorMessage || "An unexpected error occurred."
     };
   } else if (request) {
     return {

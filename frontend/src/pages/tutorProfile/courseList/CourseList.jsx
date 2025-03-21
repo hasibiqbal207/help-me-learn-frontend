@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { ListGroup, Badge, Button, Row, Col } from "react-bootstrap";
+import { ListGroup, Badge, Button, Row, Col, Alert } from "react-bootstrap";
 import { getUserType } from "../../../core/selectors/user";
 import { getTutorCourseDataById } from "../../../core/selectors/tutor";
 import { getTutorOfferedCourseById } from "../../../core/actionCreators/tutor";
@@ -28,7 +28,14 @@ export default function CourseList(props) {
     tutorCourses.length === undefined ||
     tutorCourses.length === 0
   ) {
-    return null;
+    return (
+      <div>
+        <span>MY COURSES</span>
+        <Alert variant="info" className="mt-3">
+          No courses available. This tutor has not added any courses yet.
+        </Alert>
+      </div>
+    );
   }
 
   return (

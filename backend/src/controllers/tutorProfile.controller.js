@@ -1,11 +1,11 @@
 import { validationResult } from "express-validator";
 import * as tutorProfileService from "../services/tutorProfile.service.js";
-import uploadFile from "../utils/upload.js";
+import uploadImage from "../utils/uploadImage.js";
 
 export const getTutorAbouInfoById = async (req, res) => {
   try {
-    console.log(req.query.userId)
-    const result = await tutorProfileService.getTutorAboutInfo(req.query.userId);
+    console.log(req.params.id)
+    const result = await tutorProfileService.getTutorAboutInfo(req.params.id);
     res.json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -90,7 +90,14 @@ export const searchTutorProfile = async (req, res) => {
 
 export const saveTutorInfo = async (req, res) => {
   try {
-    await uploadFile(req, res);
+    await uploadImage.uploadImageMiddleware(req, res);
+    
+    console.log("Processing profile update request:", {
+      userId: req.body.userId,
+      about: req.body.about,
+      age: req.body.age,
+      file: req.file ? req.file.originalname : 'No file uploaded'
+    });
     
     const profileData = {
       userId: req.body.userId,
@@ -99,9 +106,21 @@ export const saveTutorInfo = async (req, res) => {
       picturePath: req.file ? `public/images/${req.file.originalname}` : null
     };
 
-    await tutorProfileService.updateTutorProfile(profileData);
-    res.status(200).json({ message: "Tutor profile updated" });
+    const result = await tutorProfileService.updateTutorProfile(profileData);
+    console.log("Profile update result:", result);
+    
+    if (result && result.success === false) {
+      return res.status(400).json({ 
+        message: result.message || "Failed to update profile"
+      });
+    }
+    
+    res.status(200).json({ 
+      message: "Tutor profile updated",
+      picturePath: profileData.picturePath
+    });
   } catch (error) {
+    console.error("Error updating tutor profile:", error);
     res.status(500).json({ message: error.message });
   }
 };

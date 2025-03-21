@@ -67,16 +67,20 @@ export function* register(action) {
     useJwtSecret: false,
   };
 
+  console.log("Sending registration request with options:", apiOptions);
   const apiResponse = yield call(executeApiCall, apiOptions);
+  console.log("Registration API response:", apiResponse);
 
   const { isSuccessful, response = {} } = apiResponse;
 
   if (isSuccessful) {
     const { message } = response;
+    console.log("Registration successful:", message);
     action.payload.navigate("/login");
     yield put(setLoginAlert(message, "success"));
   } else {
     const errorMessage = response.ErrorMessage || response.message;
+    console.error("Registration failed:", errorMessage);
     yield put(setRegistrationAlert(errorMessage));
   }
 }

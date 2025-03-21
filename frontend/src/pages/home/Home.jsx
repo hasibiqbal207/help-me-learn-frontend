@@ -22,6 +22,7 @@ function Home() {
   function renderHome() {
     switch (userType) {
       case "admin":
+        console.log("admin");
         return (
           <Page>
             <Admin />

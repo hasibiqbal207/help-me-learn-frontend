@@ -13,7 +13,11 @@ const updateUserValidation = [
   body("status").notEmpty().isIn([100, 101, 102]),
 ];
 
-const createTutorProfileValidation = [body("userId").notEmpty().isInt()];
+const createTutorProfileValidation = [
+  body("userId").notEmpty().isInt().withMessage("User ID is required and must be an integer"),
+  body("age").optional().isInt().withMessage("Age must be a number if provided"),
+  body("about").optional().isString().withMessage("About must be a string if provided")
+];
 
 const updateTutorProfileValidation = [
   body("userId").notEmpty().isInt(),
