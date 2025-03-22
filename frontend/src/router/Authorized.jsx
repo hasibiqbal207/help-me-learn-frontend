@@ -1,11 +1,16 @@
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
-import { isAuthenticated } from "../core/selectors/user";
+import { isAuthenticated, getUserType } from "../core/selectors/user";
 
 export const Authorized = ({ component: RouteComponent }) => {
-  const renderComponent = useSelector(isAuthenticated);
+  const authenticated = useSelector(isAuthenticated);
+  const userType = useSelector(getUserType);
+  
+  // Debug authentication and user type
+  console.log("Authorized component - Is authenticated:", authenticated);
+  console.log("Authorized component - User type:", userType);
 
-  if (renderComponent) {
+  if (authenticated) {
     return <RouteComponent />;
   }
 

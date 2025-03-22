@@ -16,6 +16,7 @@ export default function* loginSaga() {
 
 export function* login(action) {
   const { email, password } = action.payload;
+  console.log("Login saga - Starting login process for email:", email);
 
   const apiOptions = {
     url: loginApi,
@@ -27,7 +28,9 @@ export function* login(action) {
     useJwtSecret: false,
   };
 
+  console.log("Login saga - Calling API with options:", loginApi);
   const apiResponse = yield call(executeApiCall, apiOptions);
+  console.log("Login saga - API response:", apiResponse);
 
   const { isSuccessful, response = {} } = apiResponse;
 
@@ -35,15 +38,21 @@ export function* login(action) {
     isSuccessful &&
     (response.message == undefined || response.message == "")
   ) {
+    console.log("Login saga - Login successful, processing token");
     const { id, email, token } = response;
     if (token !== undefined) {
       let decoded = jwt_decode(token);
-      console.log(decoded);
+      console.log("Login saga - Decoded token:", decoded);
       const { id, email, userType, status, exp } = decoded;
       yield put(setCurrentUser({ id, email, userType, status, exp, token }));
+      console.log("Login saga - User set in state");
+    } else {
+      console.error("Login saga - Token is undefined in successful response");
+      yield put(setLoginAlert("Authentication failed: Invalid token"));
     }
   } else {
-    const errorMessage = response.message || response.ErrorMessage;
+    const errorMessage = response.message || response.ErrorMessage || "Unknown error occurred";
+    console.error("Login saga - Login failed:", errorMessage);
     yield put(setLoginAlert(errorMessage));
   }
 }

@@ -1,22 +1,35 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "./login.css";
 import Header from "../../components/header/Header";
 
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../core/actionCreators/user";
-import { getLoginAlert } from "../../core/selectors/user";
+import { getLoginAlert, getUserType, isAuthenticated } from "../../core/selectors/user";
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const userType = useSelector(getUserType);
+  const authenticated = useSelector(isAuthenticated);
 
   const loginAlert = useSelector(getLoginAlert);
+
+  // Handle redirection after successful login
+  useEffect(() => {
+    if (authenticated) {
+      console.log("Login component - Authentication detected, redirecting user type:", userType);
+      // All user types now go to home, the navbar will show different options
+      navigate("/home");
+    }
+  }, [authenticated, userType, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     let elements = e.target.elements;
-
+    
+    console.log("Login form submitted", elements.email.value);
     dispatch(loginUser(elements.email.value, elements.password.value));
   };
 

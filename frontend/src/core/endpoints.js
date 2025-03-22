@@ -12,8 +12,8 @@ export const offerCourseApi = `${baseUrl}/posts`;
 export const qualificationApi = `${baseUrl}/qualifications`;
 export const fileUploadApi = `${baseUrl}/upload`;
 
-export const allStudentListApi = `${baseUrl}/users/?UserType=102`;
-export const allTutorListApi = `${baseUrl}/users/?UserType=101`;
+export const allStudentListApi = `${baseUrl}/users?userType=102`;
+export const allTutorListApi = `${baseUrl}/users?userType=101`;
 export const pendingTutorListApi = `${baseUrl}/courses?Status=100`;
 
 export const socketIOUrl = `${import.meta.env.VITE_BACKEND_API_BASEURL}`;

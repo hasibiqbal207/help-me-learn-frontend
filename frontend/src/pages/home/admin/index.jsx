@@ -200,7 +200,7 @@ export default function Admin() {
 
   return (
     <div>
-      <h2 className="mb-4">Welcome, Admin.</h2>
+      <h4 className="mb-4 border-bottom pb-2">Dashboard</h4>
       
       {/* Pending Tutor Requests Section */}
       <Card className="mb-4">

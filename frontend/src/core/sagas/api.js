@@ -31,16 +31,19 @@ export function* executeApiCall(options) {
   };
 
   const { url, method, params, headers, timeout, useJwtSecret } = apiOptions;
+  console.log("API call - Starting API call to:", url, "with method:", method);
   initializeApiResponse(apiOptions);
 
   // Check network connectivity
   const isConnected = yield call(isOnline);
   if (!isConnected) {
+    console.error("API call - Network error: Not connected to the internet");
     return handleNetworkError(apiOptions);
   }
 
   // Handle JWT authorization if required
   if (useJwtSecret && !(yield authorizeRequest(headers))) {
+    console.error("API call - Authorization error: Failed to authorize request");
     return handleAuthError(apiOptions);
   }
 
@@ -49,20 +52,25 @@ export function* executeApiCall(options) {
   const axiosOpts = configureAxiosRequest({
     url, method, timeout, headers, params, body: apiOptions.body, cancelToken: requestCancellation.token,
   });
+  console.log("API call - Axios options configured:", { url, method });
 
   // Execute the API call
   try {
+    console.log("API call - Executing actual API call");
     const { response, timeout } = yield call(executeActualApiCall, axiosOpts);
 
     if (timeout) {
+      console.error("API call - Request timed out");
       requestCancellation.cancel("Request timeout.");
       return handleTimeoutError(apiOptions);
     }
     
     // Successful API call
+    console.log("API call - Successfully received response with status:", response?.status);
     return buildSuccessfulResponse(apiOptions, response);
 
   } catch (error) {
+    console.error("API call - Error during API call:", error.message);
     return handleApiError(apiOptions, error);
   }
 }
