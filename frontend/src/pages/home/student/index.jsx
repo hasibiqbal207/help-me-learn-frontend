@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Fab } from "react-tiny-fab";
 import TutorList from "./tutorList/TutorList";
@@ -10,9 +10,12 @@ import { getUserType } from "../../../core/selectors/user";
 
 export default function Student() {
   const dispatch = useDispatch();
-
-  dispatch(fetchApprovedCourseList());
   const [showChat, toggleChat] = useState(false);
+
+  useEffect(() => {
+    console.log("Student component mounted, fetching approved course list");
+    dispatch(fetchApprovedCourseList());
+  }, [dispatch]);
 
   const chatClosed = () => toggleChat(false);
   const chatOpened = () => toggleChat(true);

@@ -14,7 +14,7 @@ export const getTutorAboutInfo = async (userId) => {
 
 export const getTutorOfferedCourses = async (userId) => {
   return executeQuery(
-    `SELECT subjectName, ratePerHour, description, experienceYears, availableTime, language, level 
+    `SELECT subjectName, ratePerHour, description, experienceYears, availableTime, language, status 
      FROM hm_post A 
      INNER JOIN hm_tutor_profile B ON (A.tutorProfileId = B.id AND B.userId = ?)`,
     [userId]
@@ -56,29 +56,74 @@ export const getTutorsByStatusFilter = async (status) => {
 };
 
 export const searchTutorProfiles = async (searchParams) => {
-  const conditions = [];
-  const { TutorProfileId, Status, maxRatePerHour, SubjectName, level, gender } = searchParams;
+  try {
+    const conditions = [];
+    const queryParams = [];
+    const { TutorProfileId, Status, maxRatePerHour, SubjectName, level, gender } = searchParams;
 
-  if (TutorProfileId) conditions.push(`id = ${database.escape(TutorProfileId)}`);
-  if (Status) conditions.push(`status = ${database.escape(Status)}`);
-  if (maxRatePerHour) conditions.push(`ratePerHour <= ${database.escape(maxRatePerHour)}`);
-  if (SubjectName) conditions.push(`MATCH(subjectName) AGAINST (${database.escape(`*${SubjectName}*`)} IN BOOLEAN MODE)`);
-  if (level) conditions.push(`level = ${database.escape(level)}`);
-  if (gender) conditions.push(`gender = ${database.escape(gender)}`);
+    console.log("Searching with parameters:", searchParams);
 
-  const baseQuery = `
-    SELECT hm_tutor_profile.userId as userId, hm_post.id, hm_post.description, 
-           hm_post.tutorProfileId, hm_post.status, hm_post.language, 
-           hm_post.subjectName, hm_post.ratePerHour, hm_post.experienceYears, 
-           hm_post.availableTime, hm_user.firstName, hm_user.lastName, 
-           hm_tutor_profile.picPath, hm_tutor_profile.about 
-    FROM hm_post
-    INNER JOIN hm_tutor_profile ON (hm_tutor_profile.id = hm_post.tutorProfileId 
-                                   AND hm_tutor_profile.status = 101)
-    INNER JOIN hm_user ON (hm_user.id = hm_tutor_profile.userId)
-    ${conditions.length ? 'WHERE ' + conditions.join(' AND ') : ''}`;
+    // Build WHERE conditions with parameterized queries for improved security
+    if (TutorProfileId) {
+      conditions.push("hm_tutor_profile.id = ?");
+      queryParams.push(TutorProfileId);
+    }
+    
+    if (Status) {
+      conditions.push("hm_post.status = ?");
+      queryParams.push(Status);
+    } else {
+      // Default to showing only approved posts (status 101)
+      conditions.push("hm_post.status = 101");
+    }
+    
+    if (maxRatePerHour) {
+      conditions.push("hm_post.ratePerHour <= ?");
+      queryParams.push(maxRatePerHour);
+    }
+    
+    if (SubjectName && SubjectName.trim() !== '') {
+      // Using LIKE for better partial matching
+      conditions.push("hm_post.subjectName LIKE ?");
+      queryParams.push(`%${SubjectName}%`);
+    }
+    
+    // Note: 'level' field isn't in the database schema, so we'll skip it
+    // but keep it in the function signature for backwards compatibility
+    
+    if (gender && gender !== '%') {
+      conditions.push("hm_user.gender = ?");
+      queryParams.push(gender);
+    }
 
-  return executeQuery(baseQuery);
+    const baseQuery = `
+      SELECT 
+        hm_tutor_profile.userId as userId, 
+        hm_tutor_profile.id as tutorProfileId,
+        hm_post.id, 
+        hm_post.description, 
+        hm_post.status, 
+        hm_post.language, 
+        hm_post.subjectName, 
+        hm_post.ratePerHour, 
+        hm_post.experienceYears, 
+        hm_post.availableTime, 
+        hm_user.firstName, 
+        hm_user.lastName, 
+        hm_user.gender,
+        hm_tutor_profile.picPath, 
+        hm_tutor_profile.about 
+      FROM hm_post
+      INNER JOIN hm_tutor_profile ON (hm_tutor_profile.id = hm_post.tutorProfileId)
+      INNER JOIN hm_user ON (hm_user.id = hm_tutor_profile.userId)
+      ${conditions.length ? 'WHERE ' + conditions.join(' AND ') : ''}
+      ORDER BY hm_user.firstName, hm_user.lastName`;
+    
+    return executeQuery(baseQuery, queryParams);
+  } catch (error) {
+    console.error("Error in searchTutorProfiles:", error);
+    throw error;
+  }
 };
 
 export const updateTutorProfile = async (profileData) => {

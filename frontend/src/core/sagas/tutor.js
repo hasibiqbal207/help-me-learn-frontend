@@ -159,21 +159,18 @@ export function* saveReview(action) {
   // const { course } = action.payload;
   console.log(action.payload);
 
-  // let url = process.env.REACT_APP_API_URL;
-  // url += `/reviews`;
-
   const apiOptions = {
     url: reviewApi,
     method: "POST",
-    params: action.payload,
+    body: action.payload,
     useJwtSecret: false,
   };
 
   const apiResponse = yield call(executeApiCall, apiOptions);
 
-  const { success } = apiResponse;
+  const { isSuccessful } = apiResponse;
   let msg = "";
-  if (success) {
+  if (isSuccessful) {
     msg = "Review Saved Successfully";
     yield put(saveReviewSuccess({ msg }));
   } else {

@@ -49,8 +49,12 @@ export const getTutorsByStatus = async (req, res) => {
 };
 
 export const searchTutorProfile = async (req, res) => {
-  try {
+  try {    
     const result = await tutorProfileService.searchTutorProfiles(req.query);
+    
+    if (result.length === 0) {
+      return res.json([]);
+    }
     
     const transformedResult = result.reduce((acc, item) => {
       let tutor = acc.find(x => x.tutorId === item.tutorProfileId);
@@ -63,28 +67,35 @@ export const searchTutorProfile = async (req, res) => {
           lastName: item.lastName,
           picPath: item.picPath,
           about: item.about,
+          gender: item.gender,
           posts: []
         };
         acc.push(tutor);
       }
 
-      tutor.posts.push({
-        id: item.id,
-        description: item.description,
-        status: item.status,
-        language: item.language,
-        ratePerHour: item.ratePerHour,
-        subjectName: item.subjectName,
-        availableTime: item.availableTime,
-        experienceYears: item.experienceYears
-      });
+      // Only add the post if it doesn't already exist in the posts array
+      if (!tutor.posts.find(post => post.id === item.id)) {
+        tutor.posts.push({
+          id: item.id,
+          description: item.description,
+          status: item.status,
+          language: item.language,
+          ratePerHour: item.ratePerHour,
+          subjectName: item.subjectName,
+          availableTime: item.availableTime,
+          experienceYears: item.experienceYears
+        });
+      }
 
       return acc;
     }, []);
 
     res.json(transformedResult);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ 
+      message: "An error occurred while searching for tutors",
+      error: error.message
+    });
   }
 };
 

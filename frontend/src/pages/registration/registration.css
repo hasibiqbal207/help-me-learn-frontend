@@ -1,5 +1,6 @@
 .registration-content {
     width: 400px;
+    margin-top: 60px;
   }
   
   .registration-button {
@@ -13,16 +14,16 @@
   
   .registration-page {
     min-height: 100vh;
-    background-color: #fbfafb;
+    background-color: #fff;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     text-align: center;
+    padding-top: 40px;
   }
   
   @media only screen and (max-width: 540px) {
-    .login-content {
+    .registration-content {
       width: 70%;
     }
   }

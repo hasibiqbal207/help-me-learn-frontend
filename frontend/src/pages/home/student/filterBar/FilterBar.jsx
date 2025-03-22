@@ -3,7 +3,6 @@ import React, { useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 
-
 export default function FilterBar(props) {
   const dispatch = useDispatch();
 
@@ -20,8 +19,21 @@ export default function FilterBar(props) {
   });
 
   React.useEffect(() => {
-    dispatch(props.fetchOfferCourse({ filters }));
-  });
+    console.log("FilterBar useEffect triggered with filters:", filters);
+    if (props.fetchOfferCourse) {
+      console.log("Dispatching fetchOfferCourse action");
+      dispatch(props.fetchOfferCourse({ filters }));
+    } else {
+      console.error("fetchOfferCourse prop is not available");
+    }
+  }, [
+    dispatch,
+    props.fetchOfferCourse,
+    filters.subjectName,
+    filters.level,
+    filters.maxRatePerHour,
+    filters.gender,
+  ]);
 
   const filterTutors = () => {
     let subjectName = subjectNameControl.current.value;
@@ -65,7 +77,6 @@ export default function FilterBar(props) {
         <Col>
           <Form.Label>Max Rate</Form.Label>
           <Form.Control
-            defaultValue={99}
             size="sm"
             ref={maxRatePerHourControl}
             type="number"
@@ -77,7 +88,6 @@ export default function FilterBar(props) {
             <option>Any</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
-            <option value="other">Other</option>
           </Form.Select>
         </Col>
       </Row>

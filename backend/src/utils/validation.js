@@ -42,6 +42,7 @@ const createReviewValidation = [
   body("userId").notEmpty().isInt(),
   body("tutorProfileId").notEmpty().isInt(),
   body("text").isString(),
+  body("rating").notEmpty().isFloat({ min: 0, max: 5 }),
 ];
 
 const createFeedbackValidation = [

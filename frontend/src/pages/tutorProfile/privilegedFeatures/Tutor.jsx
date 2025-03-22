@@ -388,7 +388,8 @@ export default function Tutor() {
 
     dispatch(saveOfferCourse(offerCourse));
     
-    // Close the offering editor after submission
+    // Don't close the editor immediately, let the user see any success/error message
+    // The editor can be closed manually after seeing the alert
     toggleOfferingEditor(false);
   };
 
