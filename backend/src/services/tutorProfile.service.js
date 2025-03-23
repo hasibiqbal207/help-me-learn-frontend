@@ -59,7 +59,7 @@ export const searchTutorProfiles = async (searchParams) => {
   try {
     const conditions = [];
     const queryParams = [];
-    const { TutorProfileId, Status, maxRatePerHour, SubjectName, level, gender } = searchParams;
+    const { TutorProfileId, status, maxRatePerHour, SubjectName, level, gender } = searchParams;
 
     console.log("Searching with parameters:", searchParams);
 
@@ -69,9 +69,9 @@ export const searchTutorProfiles = async (searchParams) => {
       queryParams.push(TutorProfileId);
     }
     
-    if (Status) {
+    if (status) {
       conditions.push("hm_post.status = ?");
-      queryParams.push(Status);
+      queryParams.push(status);
     } else {
       // Default to showing only approved posts (status 101)
       conditions.push("hm_post.status = 101");

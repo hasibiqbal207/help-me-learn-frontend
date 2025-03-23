@@ -30,8 +30,9 @@ export function* executeApiCall(options) {
     body: JSON.stringify(options.body),
   };
 
-  const { url, method, params, headers, timeout, useJwtSecret } = apiOptions;
+  const { url, method, params, headers, timeout, useJwtSecret, body } = apiOptions;
   console.log("API call - Starting API call to:", url, "with method:", method);
+  console.log("API call - Request body:", body);
   initializeApiResponse(apiOptions);
 
   // Check network connectivity
@@ -52,7 +53,7 @@ export function* executeApiCall(options) {
   const axiosOpts = configureAxiosRequest({
     url, method, timeout, headers, params, body: apiOptions.body, cancelToken: requestCancellation.token,
   });
-  console.log("API call - Axios options configured:", { url, method });
+  console.log("API call - Full Axios config:", JSON.stringify(axiosOpts, null, 2));
 
   // Execute the API call
   try {

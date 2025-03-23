@@ -7,6 +7,7 @@ import qualification from "./qualification";
 import manageUsers from "./manageUsers";
 import manageTutorsProfile from "./manageTutorsProfile";
 import dashboard from "./dashboard";
+import post from "./post";
 
 const rootReducer = combineReducers({
   tutor,
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   manageUsers,
   manageTutorsProfile,
   dashboard,
+  post,
 });
 
 export default rootReducer;

@@ -14,6 +14,7 @@ import { getOfferCourseSaveAlert } from "../../../core/selectors/offerCourse";
 import { getTutorInfoById } from "../../../core/actionCreators/tutor";
 import { getTutorInfoDataById } from "../../../core/selectors/tutor";
 import { faker } from '@faker-js/faker';
+import PendingPosts from "./PendingPosts";
 
 export default function Tutor() {
   const navigate = useNavigate();
@@ -478,12 +479,25 @@ export default function Tutor() {
   }
 
   return (
-    <div>
+    <>
+      <PendingPosts />
       {renderChatOption()}
-      <Chat showChat={showChat} chatClosed={chatClosed} />
+      <Offcanvas
+        className="chat-container"
+        placement="end"
+        show={showChat}
+        onHide={chatClosed}
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Chat</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body className="p-0">
+          <Chat />
+        </Offcanvas.Body>
+      </Offcanvas>
       {renderEditor()}
       {renderQualificationEditor()}
       {renderOfferingEditor()}
-    </div>
+    </>
   );
 }

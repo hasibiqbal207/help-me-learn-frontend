@@ -5,6 +5,9 @@ import {
   SAVE_OFFER_COURSE_FAILED,
   FETCH_OFFER_COURSE_LIST,
   SET_OFFER_COURSE_LIST,
+  UPDATE_OFFER_COURSE_STATUS,
+  UPDATE_OFFER_COURSE_STATUS_SUCCESS,
+  UPDATE_OFFER_COURSE_STATUS_FAILED
 } from "../actionTypes/offerCourse";
 
 export const INITIAL_STATE = {
@@ -16,6 +19,8 @@ export const INITIAL_STATE = {
     gender: undefined,
   },
   saveAlert: undefined,
+  statusUpdateMessage: null,
+  error: null
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -58,6 +63,27 @@ export default (state = INITIAL_STATE, action) => {
           message: action.data?.msg || "Failed to submit course offering. Please try again.",
         },
       };
+      
+    // Handle tutor course offering status update actions
+    case UPDATE_OFFER_COURSE_STATUS:
+      return {
+        ...state,
+        statusUpdateMessage: null,
+        error: null
+      };
+    case UPDATE_OFFER_COURSE_STATUS_SUCCESS:
+      return {
+        ...state,
+        statusUpdateMessage: action.payload.message,
+        error: null
+      };
+    case UPDATE_OFFER_COURSE_STATUS_FAILED:
+      return {
+        ...state,
+        statusUpdateMessage: null,
+        error: action.payload.error
+      };
+      
     default:
       return state;
   }

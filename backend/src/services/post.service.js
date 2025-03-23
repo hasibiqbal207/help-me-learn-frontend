@@ -53,34 +53,81 @@ export const deletePostById = async (id) => {
 };
 
 export const updatePostById = async (postData) => {
-  const {
-    description,
-    tutorProfileId,
-    status,
-    language,
-    subjectName,
-    ratePerHour,
-    date,
-    experienceYears,
-    availableTime,
-    id,
-  } = postData;
+  const { id, ...fields } = postData;
+  
+  // Validate that id exists
+  if (!id) {
+    throw new Error('Post ID is required for update operation');
+  }
 
-  return executeQuery(
-    "UPDATE hm_post SET description=?, tutorProfileId=?, status=?, `language`=?, subjectName=?, ratePerHour=?, modifiedDateTime=?, experienceYears=?, availableTime=? WHERE id = ?;",
-    [
-      description,
-      tutorProfileId,
-      status,
-      language,
-      subjectName,
-      ratePerHour,
-      date,
-      experienceYears,
-      availableTime,
-      id,
-    ]
-  );
+  // Build dynamic query based on available fields
+  const fieldUpdates = [];
+  const values = [];
+
+  // Add each existing field to the update query
+  if (fields.description !== undefined) {
+    fieldUpdates.push('description=?');
+    values.push(fields.description);
+  }
+  
+  if (fields.tutorProfileId !== undefined) {
+    fieldUpdates.push('tutorProfileId=?');
+    values.push(fields.tutorProfileId);
+  }
+  
+  if (fields.status !== undefined) {
+    fieldUpdates.push('status=?');
+    values.push(fields.status);
+  }
+  
+  if (fields.language !== undefined) {
+    fieldUpdates.push('`language`=?');
+    values.push(fields.language);
+  }
+  
+  if (fields.subjectName !== undefined) {
+    fieldUpdates.push('subjectName=?');
+    values.push(fields.subjectName);
+  }
+  
+  if (fields.ratePerHour !== undefined) {
+    fieldUpdates.push('ratePerHour=?');
+    values.push(fields.ratePerHour);
+  }
+  
+  if (fields.date !== undefined) {
+    fieldUpdates.push('modifiedDateTime=?');
+    values.push(fields.date);
+  }
+  
+  if (fields.experienceYears !== undefined) {
+    fieldUpdates.push('experienceYears=?');
+    values.push(fields.experienceYears);
+  }
+  
+  if (fields.availableTime !== undefined) {
+    fieldUpdates.push('availableTime=?');
+    values.push(fields.availableTime);
+  }
+  
+  // Add current timestamp for modifiedDateTime if not provided
+  if (!fields.date) {
+    fieldUpdates.push('modifiedDateTime=?');
+    values.push(new Date());
+  }
+  
+  // If no fields to update, return early
+  if (fieldUpdates.length === 0) {
+    return { affectedRows: 0, message: "No fields to update" };
+  }
+  
+  // Add the id to the values array for the WHERE clause
+  values.push(id);
+  
+  // Construct the final query
+  const query = `UPDATE hm_post SET ${fieldUpdates.join(', ')} WHERE id = ?;`;
+  
+  return executeQuery(query, values);
 };
 
 export const getPostById = async (id) => {
@@ -95,22 +142,22 @@ export const searchPosts = async (queryParams) => {
   const { tutorProfileId, status, ratePerHour, subjectName } = queryParams;
 
   if (tutorProfileId !== undefined) {
-    joinQuery += `tutorProfileId = ${database.escape(tutorProfileId)}`;
+    joinQuery += `hm_post.tutorProfileId = ${database.escape(tutorProfileId)}`;
   }
 
   if (status !== undefined) {
     if (joinQuery !== "") joinQuery += " and ";
-    joinQuery += `status = ${database.escape(status)}`;
+    joinQuery += `hm_post.status = ${database.escape(status)}`;
   }
 
   if (ratePerHour !== undefined) {
     if (joinQuery !== "") joinQuery += " and ";
-    joinQuery += `ratePerHour = ${database.escape(ratePerHour)}`;
+    joinQuery += `hm_post.ratePerHour = ${database.escape(ratePerHour)}`;
   }
 
   if (subjectName !== undefined) {
     if (joinQuery !== "") joinQuery += " and ";
-    joinQuery += `MATCH(subjectName) AGAINST (${database.escape(subjectName)})`;
+    joinQuery += `MATCH(hm_post.subjectName) AGAINST (${database.escape(subjectName)})`;
   }
 
   let dbQuery =

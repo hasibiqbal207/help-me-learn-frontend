@@ -9,6 +9,9 @@ import {
   SET_COURSE_LIST_BY_STATUS_LOADING,
   GET_COURSE_LIST_BY_STATUS_SUCCESS,
   GET_COURSE_LIST_BY_STATUS_FAILED,
+  UPDATE_COURSE_STATUS,
+  UPDATE_COURSE_STATUS_SUCCESS,
+  UPDATE_COURSE_STATUS_FAILED
 } from "../actionTypes/course";
 
 export const fetchApprovedCourseList = (payload) => {
@@ -70,3 +73,32 @@ export const getCourseListByStatusSuccess = (payload) => ({
 export const getCourseListByStatusFailed = () => ({
   type: GET_COURSE_LIST_BY_STATUS_FAILED,
 });
+
+// Update course status (for approval/rejection)
+export const updateCourseStatus = (courseId, status) => {
+  return {
+    type: UPDATE_COURSE_STATUS,
+    payload: {
+      id: courseId,
+      status
+    },
+  };
+};
+
+export const updateCourseStatusSuccess = (message) => {
+  return {
+    type: UPDATE_COURSE_STATUS_SUCCESS,
+    payload: {
+      message
+    },
+  };
+};
+
+export const updateCourseStatusFailed = (error) => {
+  return {
+    type: UPDATE_COURSE_STATUS_FAILED,
+    payload: {
+      error
+    },
+  };
+};

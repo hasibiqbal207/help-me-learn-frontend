@@ -14,11 +14,11 @@ export function* fetchUsersList(action) {
   const { firstName, lastName, email, userType, status } = filters;
 
   let params = {
-    FirstName: firstName || undefined,
-    LastName: lastName || undefined,
-    Email: email || undefined,
-    UserType: userType == -1 ? undefined : userType,
-    Status: status == -1 ? undefined : status,
+    firstName: firstName || undefined,
+    lastName: lastName || undefined,
+    email: email || undefined,
+    userType: userType == -1 ? undefined : userType,
+    status: status == -1 ? undefined : status,
   };
 
   const apiOptions = {

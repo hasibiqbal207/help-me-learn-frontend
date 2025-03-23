@@ -18,8 +18,8 @@ function TutorProfileItem(props) {
 
   const handleSubmit = (updatedStatus) => {
     let updatedItem = {
-      UserId: userId,
-      Status: updatedStatus,
+      userId: userId,
+      status: updatedStatus,
     };
 
     dispatch(updateTutorProfile(updatedItem));

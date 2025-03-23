@@ -41,10 +41,10 @@ export const deletePost = async (req, res) => {
 
 export const updatePost = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+    // const errors = validationResult(req);
+    // if (!errors.isEmpty()) {
+    //   return res.status(400).json({ errors: errors.array() });
+    // }
 
     const postData = {
       ...req.body,

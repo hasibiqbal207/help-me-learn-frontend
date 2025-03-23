@@ -19,13 +19,13 @@ function UserItem(props) {
 
   const handleSubmit = (updatedStatus) => {
     let updatedItem = {
-      Id: id,
-      FirstName: firstName,
-      LastName: lastName,
-      UserType: usertype,
-      Email: email,
-      Status: updatedStatus,
-      Gender: gender,
+      id: id,
+      firstName: firstName,
+      lastName: lastName,
+      userType: usertype,
+      email: email,
+      status: updatedStatus,
+      gender: gender,
     };
     dispatch(updateUser(updatedItem));
   };

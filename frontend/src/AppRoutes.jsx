@@ -53,6 +53,7 @@ const AppRoutes = () => {
         <Route path="/admin" element={<Authorized component={withAdminLayout(Admin)} />} />
         <Route path="/admin/tutors" element={<Authorized component={withAdminLayout(TutorsList)} />} />
         <Route path="/admin/students" element={<Authorized component={withAdminLayout(StudentsList)} />} />
+        
       </Routes>
     </Router>
   );           

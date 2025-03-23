@@ -9,6 +9,7 @@ import fileUploadSaga from "./fileUpload";
 import manageUsersSaga from "./manageUsers";
 import manageTutorsProfile from "./manageTutorsProfile";
 import dashboard from "./dashboard";
+import postSaga from "./post";
 
 export default function* rootSaga() {
   yield all([
@@ -22,5 +23,6 @@ export default function* rootSaga() {
     fork(manageUsersSaga),
     fork(manageTutorsProfile),
     fork(dashboard),
+    fork(postSaga),
   ]);
 }

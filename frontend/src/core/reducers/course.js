@@ -8,11 +8,17 @@ import {
   SET_COURSE_LIST_BY_STATUS_LOADING,
   GET_COURSE_LIST_BY_STATUS_SUCCESS,
   GET_COURSE_LIST_BY_STATUS_FAILED,
+  UPDATE_COURSE_STATUS,
+  UPDATE_COURSE_STATUS_SUCCESS,
+  UPDATE_COURSE_STATUS_FAILED
 } from "../actionTypes/course";
 
 export const INITIAL_STATE = {
   data: [],
   status: "",
+  approvedCourseList: [],
+  statusUpdateMessage: null,
+  error: null
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -49,6 +55,27 @@ export default (state = INITIAL_STATE, action) => {
     }
     case GET_COURSE_LIST_BY_STATUS_FAILED:
       return INITIAL_STATE;
+      
+    // Handle course status update actions
+    case UPDATE_COURSE_STATUS:
+      return {
+        ...state,
+        statusUpdateMessage: null,
+        error: null
+      };
+    case UPDATE_COURSE_STATUS_SUCCESS:
+      return {
+        ...state,
+        statusUpdateMessage: action.payload.message,
+        error: null
+      };
+    case UPDATE_COURSE_STATUS_FAILED:
+      return {
+        ...state,
+        statusUpdateMessage: null,
+        error: action.payload.error
+      };
+      
     default:
       return state;
   }

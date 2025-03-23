@@ -1,261 +1,482 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Row, Col, Card, Table, Button } from "react-bootstrap";
-import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import { Card, Table, Button, Modal, Form, Row, Col, Badge, Container, Toast, ToastContainer } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchDashboardData } from "../../../core/actionCreators/dashboard";
-import { getDashboardData } from "../../../core/selectors/dashboard";
-import { fetchTutorsProfileList } from "../../../core/actionCreators/manageTutorsProfile";
-import { getTutorsProfileList } from "../../../core/selectors/manageTutorsProfile";
-import { fetchCourseListByStatus } from "../../../core/actionCreators/course";
+import { fetchCourseListByStatus, saveCourse, updateCourseStatus } from "../../../core/actionCreators/course";
+import { fetchOfferCourse, updateOfferCourseStatus } from "../../../core/actionCreators/offerCourse";
+import { getCourseSearchResult } from "../../../core/selectors/offerCourse";
+import { searchPost, updatePostStatus } from "../../../core/actionCreators/post";
+import { getPostSearchResult, getPostLoading } from "../../../core/selectors/post";
 
 export default function Admin() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [pendingTutors, setPendingTutors] = useState([]);
-  const [pendingCourses, setPendingCourses] = useState([]);
+  
+  // State for the Add New Subject modal
+  const [showModal, setShowModal] = useState(false);
+  const [newSubject, setNewSubject] = useState({
+    department: "",
+    subjectName: "",
+    description: ""
+  });
+  
+  // State for approval/rejection confirmation modals
+  const [confirmationModal, setConfirmationModal] = useState({
+    show: false,
+    type: '', // 'approve' or 'reject'
+    itemType: '', // 'post', 'course', or 'tutorCourse' 
+    itemId: null,
+    tutorId: null,
+    title: '',
+    message: ''
+  });
+  
+  // State for action processing
+  const [processing, setProcessing] = useState({
+    postId: null,
+    loading: false
+  });
+  
+  // State for notifications
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    variant: "success"
+  });
 
   useEffect(() => {
-    dispatch(fetchDashboardData());
+    console.log("Admin component mounted, fetching pending data");
     
-    // Fetch pending tutors (status 100)
-    dispatch(fetchTutorsProfileList({ filters: { status: "100" } }));
+    // Fetch pending tutor courses (status 100)
+    dispatch(fetchOfferCourse({ filters: { status: "100" } }));
     
-    // Fetch pending courses (status 100)
+    // Fetch pending subjects/courses (status 100)
     dispatch(fetchCourseListByStatus("100"));
-  }, []);
-
-  // Get data from the redux store
-  const data = useSelector(getDashboardData);
-  const tutorsData = useSelector(getTutorsProfileList);
-  const coursesData = useSelector(state => state.course?.data || []);
-
-  useEffect(() => {
-    if (tutorsData) {
-      setPendingTutors(tutorsData);
-    }
-  }, [tutorsData]);
-
-  useEffect(() => {
-    if (coursesData) {
-      setPendingCourses(coursesData);
-    }
-  }, [coursesData]);
-
-  let usersByStatus = [
-    { name: "Approved", value: 0, color: "#0088FE" },
-    { name: "Rejected", value: 0, color: "#FF0000" },
-    { name: "Pending", value: 0, color: "#FFBB28" },
-  ];
-
-  let postsByStatus = [
-    { name: "Approved", value: 0, color: "#0088FE" },
-    { name: "Rejected", value: 0, color: "#FF0000" },
-    { name: "Pending", value: 0, color: "#FFBB28" },
-  ];
-
-  let usersByType = [
-    { name: "Student", value: 0, color: "#FFBB28" },
-    { name: "Tutor", value: 0, color: "#00C49F" },
-  ];
-
-  if (data) {
-    if (data.UsersByStatus) {
-      usersByStatus[0].value = data.UsersByStatus[0].value;
-      usersByStatus[1].value = data.UsersByStatus[2].value;
-      usersByStatus[2].value = data.UsersByStatus[1].value;
-    }
-
-    if (data.PostByStatus) {
-      postsByStatus[0].value = data.PostByStatus[0].value;
-      postsByStatus[1].value = data.PostByStatus[2].value;
-      postsByStatus[2].value = data.PostByStatus[1].value;
-    }
-
-    if (data.UsersByType) {
-      usersByType[0].value = data.UsersByType[0].value;
-      usersByType[1].value = data.UsersByType[1].value;
-    }
-  }
-
-  const renderLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-    index,
-  }) => {
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="white"
-        textAnchor={x > cx ? "start" : "end"}
-        dominantBaseline="central"
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
-  };
-
-  const onUsersByStatus = (data, index) => {
-    let status;
-    if (data.name == "Approved") {
-      status = "101";
-    } else if (data.name == "Rejected") {
-      status = "102";
-    } else {
-      status = "100";
-    }
-    navigate(`/users?status=${status}`);
-  };
-
-  const onUsersByType = (data, index) => {
-    let userType;
-    if (data.name == "Student") {
-      userType = "102";
-    } else {
-      userType = "101";
-    }
-    navigate(`/users?userType=${userType}`);
-  };
-
-  const onPostsByStatus = (data, index) => {
-    let status;
-    if (data.name == "Approved") {
-      status = "101";
-    } else if (data.name == "Rejected") {
-      status = "102";
-    } else {
-      status = "100";
-    }
-    navigate(`/posts?status=${status}`);
-  };
-
-  const renderPieChart = (title, data, onClick) => {
-    return (
-      <Card body>
-        <Card.Subtitle className="mb-2 text-muted">{title}</Card.Subtitle>
-        <PieChart width={300} height={300}>
-          <Pie
-            data={data}
-            dataKey="value"
-            cx="50%"
-            cy="50%"
-            outerRadius={90}
-            labelLine={false}
-            label={renderLabel}
-            onClick={onClick}
-          >
-            {data.map((item, index) => (
-              <Cell
-                style={{ cursor: "pointer" }}
-                key={`cell-${index}`}
-                fill={item.color}
-              />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </Card>
-    );
-  };
-
-  // Handle view, approve, reject actions for tutors
-  const handleTutorAction = (action, userId) => {
-    // Implement the action handling logic here
-    console.log(`Tutor action: ${action} for user ${userId}`);
     
-    // Navigate to tutor profile if view action
+    // Fetch pending posts (status 100)
+    dispatch(searchPost({ status: "100" }));
+  }, [dispatch]);
+
+  // Get data directly from the redux store using selectors
+  const pendingCourses = useSelector(state => state.course?.data || []);
+  const pendingTutorCourses = useSelector(getCourseSearchResult);
+  const pendingPosts = useSelector(getPostSearchResult);
+  const loadingPosts = useSelector(getPostLoading);
+  
+  // Log the current state to debug
+  useEffect(() => {
+    console.log("Current redux state in Admin component:");
+    console.log("Pending courses:", pendingCourses);
+    console.log("Pending tutor courses:", pendingTutorCourses);
+    console.log("Pending posts:", pendingPosts);
+  }, [pendingCourses, pendingTutorCourses, pendingPosts]);
+
+  // Handle view, approve, reject actions for tutor course offerings
+  const handleTutorCourseAction = (action, courseId, tutorId) => {
+    console.log(`Tutor course action: ${action} for course ${courseId} offered by tutor ${tutorId}`);
+    
     if (action === 'view') {
-      navigate(`/tutor/${userId}`);
+      navigate(`/tutor/${tutorId}`);
+    } else if (action === 'approve') {
+      // Show confirmation modal
+      setConfirmationModal({
+        show: true,
+        type: 'approve',
+        itemType: 'tutorCourse',
+        itemId: courseId,
+        tutorId: tutorId,
+        title: 'Approve Course Offering',
+        message: 'Are you sure you want to approve this course offering? It will be visible to all students.'
+      });
+    } else if (action === 'reject') {
+      // Show confirmation modal
+      setConfirmationModal({
+        show: true,
+        type: 'reject',
+        itemType: 'tutorCourse',
+        itemId: courseId,
+        tutorId: tutorId,
+        title: 'Reject Course Offering',
+        message: 'Are you sure you want to reject this course offering? This action cannot be undone.'
+      });
     }
-    // For approve/reject, you would typically dispatch an action
-    // to update the tutor status
   };
 
-  // Handle view, approve, reject actions for courses
+  // Handle view, approve, reject actions for courses/subjects
   const handleCourseAction = (action, courseId) => {
-    // Implement the action handling logic here
     console.log(`Course action: ${action} for course ${courseId}`);
     
-    // For approve/reject, you would typically dispatch an action
-    // to update the course status
+    if (action === 'view') {
+      // Show details in a modal (optional future enhancement)
+    } else if (action === 'approve') {
+      // Show confirmation modal
+      setConfirmationModal({
+        show: true,
+        type: 'approve',
+        itemType: 'course',
+        itemId: courseId,
+        title: 'Approve Subject',
+        message: 'Are you sure you want to approve this subject? It will be available for all tutors to offer.'
+      });
+    } else if (action === 'reject') {
+      // Show confirmation modal
+      setConfirmationModal({
+        show: true,
+        type: 'reject',
+        itemType: 'course',
+        itemId: courseId,
+        title: 'Reject Subject',
+        message: 'Are you sure you want to reject this subject? This action cannot be undone.'
+      });
+    }
   };
 
-  // Function to add a new subject
+  // Handle view, approve, reject actions for posts
+  const handlePostAction = (action, postId, tutorId) => {
+    console.log(`Post action: ${action} for post ${postId} by tutor ${tutorId}`);
+    
+    if (action === 'view') {
+      navigate(`/tutor/${tutorId}`);
+    } else if (action === 'approve') {
+      // Show confirmation modal
+      setConfirmationModal({
+        show: true,
+        type: 'approve',
+        itemType: 'post',
+        itemId: postId,
+        tutorId: tutorId,
+        title: 'Approve Post',
+        message: 'Are you sure you want to approve this post? It will be visible to all students.'
+      });
+    } else if (action === 'reject') {
+      // Show confirmation modal
+      setConfirmationModal({
+        show: true,
+        type: 'reject',
+        itemType: 'post',
+        itemId: postId,
+        tutorId: tutorId,
+        title: 'Reject Post',
+        message: 'Are you sure you want to reject this post? This action cannot be undone.'
+      });
+    }
+  };
+
+  // Function to handle action confirmation
+  const handleConfirmAction = () => {
+    const { type, itemType, itemId, tutorId } = confirmationModal;
+    
+    console.log("Confirmation action:", { type, itemType, itemId, tutorId });
+    
+    // Set the processing state
+    setProcessing({
+      postId: itemId,
+      loading: true
+    });
+    
+    // Close the modal immediately to prevent multiple clicks
+    setConfirmationModal(prevState => ({
+      ...prevState,
+      show: false
+    }));
+    
+    if (itemType === 'post') {
+      // Explicitly define status codes
+      const statusCode = type === 'approve' ? "101" : "102";
+      console.log(`Attempting to update post ${itemId} status to ${statusCode}`);
+      
+      // Dispatch the action
+      dispatch(updatePostStatus(itemId, statusCode));
+      
+      // Show toast notification
+      showToast(`Post ${type === 'approve' ? 'approved' : 'rejected'} successfully`, 
+                type === 'approve' ? 'success' : 'danger');
+      
+      // Refresh posts after a short delay
+      setTimeout(() => {
+        console.log(`Refreshing posts after ${type} action`);
+        dispatch(searchPost({ status: "100" }));
+        setProcessing({
+          postId: null,
+          loading: false
+        });
+      }, 1500); // Increased delay to ensure update completes
+    } else if (itemType === 'course') {
+      // Similar pattern for course items
+      const statusCode = type === 'approve' ? "101" : "102";
+      dispatch(updateCourseStatus(itemId, statusCode));
+      showToast(`Subject ${type === 'approve' ? 'approved' : 'rejected'} successfully`, 
+                type === 'approve' ? 'success' : 'danger');
+      
+      setTimeout(() => {
+        dispatch(fetchCourseListByStatus("100"));
+        setProcessing({
+          postId: null,
+          loading: false
+        });
+      }, 1500);
+    } else if (itemType === 'tutorCourse') {
+      // Similar pattern for tutor course items
+      const statusCode = type === 'approve' ? "101" : "102";
+      dispatch(updateOfferCourseStatus(itemId, statusCode));
+      showToast(`Course offering ${type === 'approve' ? 'approved' : 'rejected'} successfully`, 
+                type === 'approve' ? 'success' : 'danger');
+      
+      setTimeout(() => {
+        dispatch(fetchOfferCourse({ filters: { status: "100" } }));
+        setProcessing({
+          postId: null,
+          loading: false
+        });
+      }, 1500);
+    }
+  };
+
+  // Helper function to show toast notifications
+  const showToast = (message, variant = "success") => {
+    setToast({
+      show: true,
+      message,
+      variant
+    });
+    
+    // Auto-hide toast after 3 seconds
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, show: false }));
+    }, 3000);
+  };
+
+  // Function to open the Add New Subject modal
   const handleAddNewSubject = () => {
-    // Implement the logic to add a new subject
-    console.log("Add new subject clicked");
-    // This might open a modal or navigate to a form page
+    setShowModal(true);
   };
 
+  // Function to handle form field changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewSubject({
+      ...newSubject,
+      [name]: value
+    });
+  };
+
+  // Function to submit the new subject
+  const handleSubmitNewSubject = () => {
+    // Validate form fields
+    if (!newSubject.department || !newSubject.subjectName) {
+      alert("Department and Subject Name are required fields");
+      return;
+    }
+
+    // Prepare data for API
+    const courseData = {
+      ...newSubject,
+      status: "100" // Set as pending for admin approval
+    };
+
+    console.log("Submitting new subject:", courseData);
+    
+    // Dispatch action to save the new course/subject
+    dispatch(saveCourse(courseData));
+    
+    // Close the modal and reset form
+    setShowModal(false);
+    setNewSubject({
+      department: "",
+      subjectName: "",
+      description: ""
+    });
+    
+    // Show success notification
+    showToast("Subject submitted for approval", "success");
+    
+    // Refresh the pending courses list after a short delay
+    setTimeout(() => {
+      console.log("Refreshing course list after adding new subject");
+      dispatch(fetchCourseListByStatus("100"));
+    }, 1000);
+  };
+
+  console.log(pendingPosts);
   return (
     <div>
       <h4 className="mb-4 border-bottom pb-2">Dashboard</h4>
       
-      {/* Pending Tutor Requests Section */}
-      <Card className="mb-4">
-        <Card.Body>
-          <Card.Title>Pending Tutor Requests</Card.Title>
-          <Table responsive>
-            <thead>
-              <tr>
-                <th>Tutor Name</th>
-                <th>Subject Name</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pendingTutors.map((tutor) => (
-                <tr key={tutor.id}>
-                  <td>{tutor.firstName} {tutor.lastName}</td>
-                  <td>{tutor.subject || 'Mathematics'}</td>
-                  <td>
-                    <Button 
-                      variant="outline-primary" 
-                      size="sm" 
-                      className="me-2"
-                      onClick={() => handleTutorAction('view', tutor.userId)}
-                    >
-                      View
-                    </Button>
-                    <Button 
-                      variant="outline-success" 
-                      size="sm" 
-                      className="me-2"
-                      onClick={() => handleTutorAction('approve', tutor.userId)}
-                    >
-                      Approve
-                    </Button>
-                    <Button 
-                      variant="outline-danger" 
-                      size="sm"
-                      onClick={() => handleTutorAction('reject', tutor.userId)}
-                    >
-                      Reject
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Card.Body>
-      </Card>
+      {/* Toast notification */}
+      <ToastContainer position="top-end" className="p-3">
+        <Toast 
+          show={toast.show} 
+          onClose={() => setToast(prev => ({ ...prev, show: false }))}
+          bg={toast.variant}
+          delay={3000}
+          autohide
+        >
+          <Toast.Header>
+            <strong className="me-auto">Notification</strong>
+          </Toast.Header>
+          <Toast.Body className={toast.variant === "danger" ? "text-white" : ""}>
+            {toast.message}
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
       
-      {/* Pending Course Requests Section */}
+      {/* Pending Posts Section */}
       <Card className="mb-4">
         <Card.Body>
           <Card.Title>
-            Pending Course Requests
+            Pending Posts
+            <Button 
+              variant="primary" 
+              size="sm" 
+              className="float-end"
+              onClick={() => dispatch(searchPost({ status: "100" }))}
+            >
+              Refresh
+            </Button>
+          </Card.Title>
+          
+          {loadingPosts ? (
+            <div className="text-center my-4">
+              <span className="spinner-border text-primary" role="status"></span>
+              <p className="mt-2">Loading pending posts...</p>
+            </div>
+          ) : pendingPosts && pendingPosts.length > 0 ? (
+            <Table responsive>
+              <thead>
+                <tr>
+                  <th>Department</th>
+                  <th>Subject</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingPosts.map((post) => (
+                  <tr key={post.id || `post-${Math.random()}`}>
+                    <td>{post.department || '-'}</td>
+                    <td>{post.subjectName || 'General Post'}</td>
+                    <td>
+                      {post.description || '-'}
+                      <small className="d-block text-muted mt-1">
+                        {post.tutorName && `Tutor: ${post.tutorName}`}
+                        {!post.tutorName && post.tutorProfileId && ` (ID: ${post.tutorProfileId})`}
+                        {post.ratePerHour && `, Fee: $${post.ratePerHour}/hr`}
+                        {post.experienceYears && `, Exp: ${post.experienceYears} years`}
+                      </small>
+                    </td>
+                    <td>
+                      <Button 
+                        variant="outline-primary" 
+                        size="sm" 
+                        className="me-2"
+                        onClick={() => handlePostAction('view', post.id, post.tutorProfileId)}
+                      >
+                        View
+                      </Button>
+                      <Button 
+                        variant="outline-success" 
+                        size="sm" 
+                        className="me-2"
+                        onClick={() => handlePostAction('approve', post.id, post.tutorProfileId)}
+                        disabled={processing.loading && processing.postId === post.id}
+                      >
+                        {processing.loading && processing.postId === post.id ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                            Processing...
+                          </>
+                        ) : 'Approve'}
+                      </Button>
+                      <Button 
+                        variant="outline-danger" 
+                        size="sm"
+                        onClick={() => handlePostAction('reject', post.id, post.tutorProfileId)}
+                        disabled={processing.loading && processing.postId === post.id}
+                      >
+                        {processing.loading && processing.postId === post.id ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                            Processing...
+                          </>
+                        ) : 'Reject'}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          ) : (
+            <p className="text-center">No pending posts found.</p>
+          )}
+        </Card.Body>
+      </Card>
+      
+      {/* Pending Tutor Course Offerings Section */}
+      <Card className="mb-4">
+        <Card.Body>
+          <Card.Title className="mb-4">Pending Tutor Course Offerings</Card.Title>
+          
+          {pendingTutorCourses && pendingTutorCourses.length > 0 ? (
+            <Row xs={1} md={2} lg={3} className="g-4">
+              {pendingTutorCourses.map((tutorCourse) => (
+                <Col key={tutorCourse.id || `course-${Math.random()}`}>
+                  <Card className="h-100 shadow-sm">
+                    <Badge bg="warning" text="dark" className="position-absolute top-0 end-0 m-2">
+                      Pending Approval
+                    </Badge>
+                    <Card.Body>
+                      <Card.Title className="fw-bold">
+                        {tutorCourse.subjectName || tutorCourse.courseName || tutorCourse.subject || 'Mathematics'}
+                      </Card.Title>
+                      <Card.Subtitle className="mb-2 text-muted">
+                        {tutorCourse.tutorName || `${tutorCourse.firstName || ''} ${tutorCourse.lastName || ''}`}
+                      </Card.Subtitle>
+                      <Card.Text className="text-muted">
+                        <small className="d-block mb-1">{`Fee: $${tutorCourse.ratePerHour || '25'}/hr`}</small>
+                        {tutorCourse.language && <small className="d-block mb-1">{`Language: ${tutorCourse.language}`}</small>}
+                        <small className="d-block mb-1">{`Experience: ${tutorCourse.experienceYears || tutorCourse.experienceLevel || 'Intermediate'}`}</small>
+                        {tutorCourse.availableTime && <small className="d-block mb-2">{`Available Time: ${tutorCourse.availableTime}`}</small>}
+                        {tutorCourse.description && <div className="mt-2 fw-light">{tutorCourse.description}</div>}
+                      </Card.Text>
+                      <div className="d-flex gap-2 mt-3">
+                        <Button 
+                          variant="outline-primary" 
+                          size="sm"
+                          onClick={() => handleTutorCourseAction('view', tutorCourse.id, tutorCourse.tutorId || tutorCourse.userId)}
+                        >
+                          View Profile
+                        </Button>
+                        <Button 
+                          variant="outline-success" 
+                          size="sm"
+                          onClick={() => handleTutorCourseAction('approve', tutorCourse.id, tutorCourse.tutorId || tutorCourse.userId)}
+                        >
+                          Approve
+                        </Button>
+                        <Button 
+                          variant="outline-danger" 
+                          size="sm"
+                          onClick={() => handleTutorCourseAction('reject', tutorCourse.id, tutorCourse.tutorId || tutorCourse.userId)}
+                        >
+                          Reject
+                        </Button>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            <p className="text-center">No pending tutor course offerings found.</p>
+          )}
+        </Card.Body>
+      </Card>
+      
+      {/* Pending Subject/Course Requests Section */}
+      <Card className="mb-4">
+        <Card.Body>
+          <Card.Title>
+            Pending Subject Requests
             <Button 
               variant="primary" 
               size="sm" 
@@ -270,60 +491,47 @@ export default function Admin() {
               <tr>
                 <th>Department</th>
                 <th>Subject</th>
+                <th>Description</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {pendingCourses.length > 0 ? pendingCourses.map((course) => (
-                <tr key={course.id}>
-                  <td>{course.department || 'Applied Computer Science'}</td>
-                  <td>{course.subjectName || 'Programming 1'}</td>
-                  <td>
-                    <Button 
-                      variant="outline-primary" 
-                      size="sm" 
-                      className="me-2"
-                      onClick={() => handleCourseAction('view', course.id)}
-                    >
-                      View
-                    </Button>
-                    <Button 
-                      variant="outline-success" 
-                      size="sm" 
-                      className="me-2"
-                      onClick={() => handleCourseAction('approve', course.id)}
-                    >
-                      Approve
-                    </Button>
-                    <Button 
-                      variant="outline-danger" 
-                      size="sm"
-                      onClick={() => handleCourseAction('reject', course.id)}
-                    >
-                      Reject
-                    </Button>
-                  </td>
-                </tr>
-              )) : (
+              {pendingCourses && pendingCourses.length > 0 ? (
+                pendingCourses.map((course) => (
+                  <tr key={course.id || `subject-${Math.random()}`}>
+                    <td>{course.department}</td>
+                    <td>{course.subjectName}</td>
+                    <td>{course.description || '-'}</td>
+                    <td>
+                      <Button 
+                        variant="outline-primary" 
+                        size="sm" 
+                        className="me-2"
+                        onClick={() => handleCourseAction('view', course.id)}
+                      >
+                        View
+                      </Button>
+                      <Button 
+                        variant="outline-success" 
+                        size="sm" 
+                        className="me-2"
+                        onClick={() => handleCourseAction('approve', course.id)}
+                      >
+                        Approve
+                      </Button>
+                      <Button 
+                        variant="outline-danger" 
+                        size="sm"
+                        onClick={() => handleCourseAction('reject', course.id)}
+                      >
+                        Reject
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
                 <tr>
-                  <td>Applied Computer Science</td>
-                  <td>Programming 1</td>
-                  <td>
-                    <Button variant="outline-primary" size="sm" className="me-2">View</Button>
-                    <Button variant="outline-success" size="sm" className="me-2">Approve</Button>
-                    <Button variant="outline-danger" size="sm">Reject</Button>
-                  </td>
-                </tr>
-              )}
-              {pendingCourses.length > 0 ? null : (
-                <tr>
-                  <td>Sociology</td>
-                  <td>Sociology 2</td>
-                  <td>
-                    <Button variant="outline-primary" size="sm" className="me-2">View</Button>
-                    <Button variant="outline-success" size="sm" className="me-2">Approve</Button>
-                    <Button variant="outline-danger" size="sm">Reject</Button>
-                  </td>
+                  <td colSpan="4" className="text-center">No pending subject requests found.</td>
                 </tr>
               )}
             </tbody>
@@ -331,18 +539,85 @@ export default function Admin() {
         </Card.Body>
       </Card>
       
-      {/* Charts Section */}
-      <Row>
-        <Col md={4} className="d-flex justify-content-start">
-          {renderPieChart("Users by Status", usersByStatus, onUsersByStatus)}
-        </Col>
-        <Col md={4} className="d-flex justify-content-center">
-          {renderPieChart("Users by Type", usersByType, onUsersByType)}
-        </Col>
-        <Col md={4} className="d-flex justify-content-end">
-          {renderPieChart("Posts by Status", postsByStatus, onPostsByStatus)}
-        </Col>
-      </Row>
+      {/* Add New Subject Modal */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Add New Subject</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Department</Form.Label>
+              <Form.Control 
+                type="text" 
+                name="department"
+                value={newSubject.department}
+                onChange={handleInputChange}
+                placeholder="e.g., Computer Science, Mathematics, Physics"
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Subject Name</Form.Label>
+              <Form.Control 
+                type="text" 
+                name="subjectName"
+                value={newSubject.subjectName}
+                onChange={handleInputChange}
+                placeholder="e.g., Programming 1, Calculus, Quantum Physics"
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Description</Form.Label>
+              <Form.Control 
+                as="textarea" 
+                name="description"
+                value={newSubject.description}
+                onChange={handleInputChange}
+                rows={3}
+                placeholder="Provide a brief description of the subject"
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleSubmitNewSubject}>
+            Submit
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      
+      {/* Confirmation Modal for Approve/Reject Actions */}
+      <Modal show={confirmationModal.show} onHide={() => setConfirmationModal(prev => ({ ...prev, show: false }))}>
+        <Modal.Header closeButton>
+          <Modal.Title>{confirmationModal.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {confirmationModal.message}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button 
+            variant="secondary" 
+            onClick={() => setConfirmationModal(prev => ({ ...prev, show: false }))}
+          >
+            Cancel
+          </Button>
+          <Button 
+            variant={confirmationModal.type === 'approve' ? 'success' : 'danger'} 
+            onClick={handleConfirmAction}
+            disabled={processing.loading}
+          >
+            {processing.loading && (
+              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            )}
+            {confirmationModal.type === 'approve' ? 'Approve' : 'Reject'}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
