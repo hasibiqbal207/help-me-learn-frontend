@@ -49,10 +49,20 @@ export default function CourseList(props) {
     console.log("Delete course:", courseId);
   };
 
+  // Check if user can edit courses (only tutors and admins)
+  const canEditCourses = userType === 'tutor' || userType === 'admin';
+  
+  // Filter courses based on user type
+  // For students and guests, only show approved courses (status !== 100)
+  // For tutors and admins, show all courses
+  const filteredCourses = canEditCourses 
+    ? tutorCourses 
+    : tutorCourses.filter(course => course.status !== 100);
+
   if (
-    tutorCourses === undefined ||
-    tutorCourses.length === undefined ||
-    tutorCourses.length === 0
+    filteredCourses === undefined ||
+    filteredCourses.length === undefined ||
+    filteredCourses.length === 0
   ) {
     return (
       <Container>
@@ -72,7 +82,7 @@ export default function CourseList(props) {
         <h4 className="fw-bold">MY COURSES</h4>
       </div>
       <Row xs={1} md={2} lg={3} className="g-4">
-        {tutorCourses.map((item, i) => (
+        {filteredCourses.map((item, i) => (
           <Col key={i}>
             <Card className="h-100 shadow-sm">
               {item.status === 100 && (
@@ -90,35 +100,37 @@ export default function CourseList(props) {
                   <div className="mt-2 fw-light">{item.description}</div>
                 </Card.Text>
               </Card.Body>
-              <Card.Footer className="bg-white border-top-0">
-                <div className="d-flex justify-content-end">
-                  <OverlayTrigger
-                    placement="top"
-                    overlay={<Tooltip>Edit</Tooltip>}
-                  >
-                    <Button 
-                      variant="outline-primary" 
-                      size="sm" 
-                      className="me-2"
-                      onClick={() => handleEdit(item.id)}
+              {canEditCourses && (
+                <Card.Footer className="bg-white border-top-0">
+                  <div className="d-flex justify-content-end">
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip>Edit</Tooltip>}
                     >
-                      <FaEdit />
-                    </Button>
-                  </OverlayTrigger>
-                  <OverlayTrigger
-                    placement="top"
-                    overlay={<Tooltip>Delete</Tooltip>}
-                  >
-                    <Button 
-                      variant="outline-danger" 
-                      size="sm"
-                      onClick={() => handleDelete(item.id)}
+                      <Button 
+                        variant="outline-primary" 
+                        size="sm" 
+                        className="me-2"
+                        onClick={() => handleEdit(item.id)}
+                      >
+                        <FaEdit />
+                      </Button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip>Delete</Tooltip>}
                     >
-                      <FaTrash />
-                    </Button>
-                  </OverlayTrigger>
-                </div>
-              </Card.Footer>
+                      <Button 
+                        variant="outline-danger" 
+                        size="sm"
+                        onClick={() => handleDelete(item.id)}
+                      >
+                        <FaTrash />
+                      </Button>
+                    </OverlayTrigger>
+                  </div>
+                </Card.Footer>
+              )}
             </Card>
           </Col>
         ))}

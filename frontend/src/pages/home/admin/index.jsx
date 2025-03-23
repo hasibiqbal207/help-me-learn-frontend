@@ -414,58 +414,74 @@ export default function Admin() {
       {/* Pending Tutor Course Offerings Section */}
       <Card className="mb-4">
         <Card.Body>
-          <Card.Title className="mb-4">Pending Tutor Course Offerings</Card.Title>
+          <Card.Title className="mb-4">
+            Pending Tutor Course Offerings
+          </Card.Title>
           
           {pendingTutorCourses && pendingTutorCourses.length > 0 ? (
-            <Row xs={1} md={2} lg={3} className="g-4">
-              {pendingTutorCourses.map((tutorCourse) => (
-                <Col key={tutorCourse.id || `course-${Math.random()}`}>
-                  <Card className="h-100 shadow-sm">
-                    <Badge bg="warning" text="dark" className="position-absolute top-0 end-0 m-2">
-                      Pending Approval
-                    </Badge>
-                    <Card.Body>
-                      <Card.Title className="fw-bold">
-                        {tutorCourse.subjectName || tutorCourse.courseName || tutorCourse.subject || 'Mathematics'}
-                      </Card.Title>
-                      <Card.Subtitle className="mb-2 text-muted">
-                        {tutorCourse.tutorName || `${tutorCourse.firstName || ''} ${tutorCourse.lastName || ''}`}
-                      </Card.Subtitle>
-                      <Card.Text className="text-muted">
-                        <small className="d-block mb-1">{`Fee: $${tutorCourse.ratePerHour || '25'}/hr`}</small>
-                        {tutorCourse.language && <small className="d-block mb-1">{`Language: ${tutorCourse.language}`}</small>}
-                        <small className="d-block mb-1">{`Experience: ${tutorCourse.experienceYears || tutorCourse.experienceLevel || 'Intermediate'}`}</small>
-                        {tutorCourse.availableTime && <small className="d-block mb-2">{`Available Time: ${tutorCourse.availableTime}`}</small>}
-                        {tutorCourse.description && <div className="mt-2 fw-light">{tutorCourse.description}</div>}
-                      </Card.Text>
-                      <div className="d-flex gap-2 mt-3">
+            <Table responsive striped hover>
+              <thead>
+                <tr>
+                  <th>Department</th>
+                  <th>Subject</th>
+                  <th>Tutor</th>
+                  <th>Rate/Hour</th>
+                  <th>Description</th>
+                  <th className="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingTutorCourses.map((tutorCourse) => (
+                  <tr key={tutorCourse.id || `course-${Math.random()}`}>
+                    <td>{tutorCourse.department || '-'}</td>
+                    <td>
+                      {tutorCourse.subjectName || tutorCourse.courseName || tutorCourse.subject || '-'}
+                      <Badge bg="warning" text="dark" className="ms-2">Pending</Badge>
+                    </td>
+                    <td>{tutorCourse.tutorName || `${tutorCourse.firstName || ''} ${tutorCourse.lastName || ''}` || '-'}</td>
+                    <td>${tutorCourse.ratePerHour || '-'}</td>
+                    <td>{tutorCourse.description || '-'}</td>
+                    <td className="text-center">
+                      <div className="d-flex justify-content-center gap-2">
                         <Button 
                           variant="outline-primary" 
                           size="sm"
                           onClick={() => handleTutorCourseAction('view', tutorCourse.id, tutorCourse.tutorId || tutorCourse.userId)}
                         >
-                          View Profile
+                          View
                         </Button>
                         <Button 
                           variant="outline-success" 
                           size="sm"
                           onClick={() => handleTutorCourseAction('approve', tutorCourse.id, tutorCourse.tutorId || tutorCourse.userId)}
+                          disabled={processing.loading && processing.postId === tutorCourse.id}
                         >
-                          Approve
+                          {processing.loading && processing.postId === tutorCourse.id && confirmationModal.type === 'approve' ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                              Approving...
+                            </>
+                          ) : 'Approve'}
                         </Button>
                         <Button 
                           variant="outline-danger" 
                           size="sm"
                           onClick={() => handleTutorCourseAction('reject', tutorCourse.id, tutorCourse.tutorId || tutorCourse.userId)}
+                          disabled={processing.loading && processing.postId === tutorCourse.id}
                         >
-                          Reject
+                          {processing.loading && processing.postId === tutorCourse.id && confirmationModal.type === 'reject' ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                              Rejecting...
+                            </>
+                          ) : 'Reject'}
                         </Button>
                       </div>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
           ) : (
             <p className="text-center">No pending tutor course offerings found.</p>
           )}
