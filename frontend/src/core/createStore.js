@@ -23,7 +23,15 @@ const middlewareList = [sagaMiddleware];
 
 const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(middlewareList),
+  middleware: (getDefaultMiddleware) => 
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore non-serializable values in the following action types
+        ignoredActions: ['fileUpload/UPLOAD_FILE'],
+        // Ignore non-serializable values in these specific paths
+        ignoredPaths: ['payload.meta.file'],
+      },
+    }).concat(middlewareList),
 });
 
 sagaMiddleware.run(rootSaga);

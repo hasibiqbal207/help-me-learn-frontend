@@ -8,6 +8,7 @@ import manageUsers from "./manageUsers";
 import manageTutorsProfile from "./manageTutorsProfile";
 import dashboard from "./dashboard";
 import post from "./post";
+import fileUpload from "./fileUpload";
 
 const rootReducer = combineReducers({
   tutor,
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   manageTutorsProfile,
   dashboard,
   post,
+  fileUpload,
 });
 
 export default rootReducer;

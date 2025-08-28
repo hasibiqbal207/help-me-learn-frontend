@@ -3,6 +3,7 @@ import { call, race, delay, select, put } from "redux-saga/effects";
 import axios from "axios";
 import { logoutUser, setLoginAlert } from "../actionCreators/user";
 import isOnline from "is-online";
+import { getCurrentUser } from "../selectors/user";
 
 const DEFAULT_TIMEOUT = 1000000;
 
@@ -20,6 +21,22 @@ export const DEFAULT_API_OPTIONS = {
   useJwtSecret: false,
 };
 
+// Function to get JWT token from Redux store
+function* retrieveJwtSecret() {
+  try {
+    const currentUser = yield select(getCurrentUser);
+    if (currentUser && currentUser.token) {
+      console.log("Retrieved JWT token for authenticated user");
+      return currentUser.token;
+    }
+    console.warn("No JWT token found in user state");
+    return null;
+  } catch (error) {
+    console.error("Error retrieving JWT token:", error);
+    return null;
+  }
+}
+
 export function* executeApiCall(options) {
   
   // Merge options with defaults
@@ -30,7 +47,7 @@ export function* executeApiCall(options) {
     body: JSON.stringify(options.body),
   };
 
-  const { url, method, params, headers, timeout, useJwtSecret, body } = apiOptions;
+  const { url, method, params, data, headers, timeout, useJwtSecret, body } = apiOptions;
   console.log("API call - Starting API call to:", url, "with method:", method);
   console.log("API call - Request body:", body);
   initializeApiResponse(apiOptions);
@@ -51,7 +68,7 @@ export function* executeApiCall(options) {
   // Set up axios request configuration
   const requestCancellation = axios.CancelToken.source();
   const axiosOpts = configureAxiosRequest({
-    url, method, timeout, headers, params, body: apiOptions.body, cancelToken: requestCancellation.token,
+    url, method, timeout, headers, params, data, body: apiOptions.body, cancelToken: requestCancellation.token,
   });
   console.log("API call - Full Axios config:", JSON.stringify(axiosOpts, null, 2));
 
@@ -104,15 +121,31 @@ function handleNetworkError(apiOptions) {
 }
 
 function* authorizeRequest(headers) {
-  const jwtSecret = yield call(retrieveJwtSecret);
-  if (jwtSecret) {
-    headers.Authorization = `Bearer ${jwtSecret}`;
-    return true;
+  try {
+    const jwtSecret = yield call(retrieveJwtSecret);
+    if (jwtSecret) {
+      console.log("Setting Authorization header with JWT token");
+      headers.Authorization = `Bearer ${jwtSecret}`;
+      return true;
+    }
+    
+    console.warn("JWT authorization failed - no token available");
+    // Only redirect to login if we're attempting to access a protected resource
+    // and the user has previously been authenticated
+    const currentUser = yield select(getCurrentUser);
+    if (currentUser) {
+      console.log("User session expired, redirecting to login");
+      yield put(setLoginAlert("Session expired. Please sign in again."));
+      yield put(logoutUser());
+    } else {
+      console.log("User not authenticated yet, skipping login redirect");
+    }
+    
+    return false;
+  } catch (error) {
+    console.error("Error during JWT authorization:", error);
+    return false;
   }
-
-  yield put(setLoginAlert("Session expired. Please sign in again."));
-  yield put(logoutUser());
-  return false;
 }
 
 function handleAuthError(apiOptions) {
@@ -123,8 +156,19 @@ function handleAuthError(apiOptions) {
   };
 }
 
-function configureAxiosRequest({ url, method, timeout, headers, params, body, cancelToken }) {
+function configureAxiosRequest({ url, method, timeout, headers, params, data, body, cancelToken }) {
   // Handle FormData objects specially for multipart uploads
+  if (data instanceof FormData) {
+    return {
+      url,
+      method,
+      timeout,
+      headers,
+      cancelToken,
+      data
+    };
+  }
+  
   if (params instanceof FormData) {
     return {
       url,
@@ -143,7 +187,7 @@ function configureAxiosRequest({ url, method, timeout, headers, params, body, ca
     timeout,
     headers,
     cancelToken,
-    ...(method === "GET" ? { params } : { data: body || params }),
+    ...(method === "GET" ? { params } : { data: body || params || data }),
   };
 }
 

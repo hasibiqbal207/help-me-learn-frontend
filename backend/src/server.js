@@ -21,6 +21,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "..", envFile) });
 
+// Define the global __basedir variable for use in other modules
+global.__basedir = path.resolve(__dirname, "..");
+console.log("Base directory set to:", global.__basedir);
+
 // Create an Express app
 const app = express();
 
@@ -50,6 +54,12 @@ app.use(
       },
     },
   })
+);
+
+// Serve uploaded files from resources/static directory
+app.use(
+  "/resources/static",
+  express.static(path.join(__basedir, "/resources/static"))
 );
 
 app.use(
